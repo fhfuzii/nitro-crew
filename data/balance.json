@@ -1,0 +1,789 @@
+{
+  "version": 1,
+  "slots": {
+    "engine": {
+      "name": "Motor",
+      "stat": "topSpeed"
+    },
+    "transmission": {
+      "name": "Câmbio",
+      "stat": "accel"
+    },
+    "tires": {
+      "name": "Pneus",
+      "stat": "grip"
+    },
+    "turbo": {
+      "name": "Turbo",
+      "stat": "boost"
+    }
+  },
+  "baseCar": {
+    "topSpeed": 10,
+    "accel": 10,
+    "grip": 10,
+    "boost": 10
+  },
+  "rarities": [
+    {
+      "id": "common",
+      "name": "Comum",
+      "statBase": 2,
+      "maxLevel": 5,
+      "scrapCoins": 5
+    },
+    {
+      "id": "uncommon",
+      "name": "Incomum",
+      "statBase": 4,
+      "maxLevel": 5,
+      "scrapCoins": 12
+    },
+    {
+      "id": "rare",
+      "name": "Rara",
+      "statBase": 7,
+      "maxLevel": 5,
+      "scrapCoins": 25
+    },
+    {
+      "id": "epic",
+      "name": "Épica",
+      "statBase": 11,
+      "maxLevel": 5,
+      "scrapCoins": 50
+    },
+    {
+      "id": "legendary",
+      "name": "Lendária",
+      "statBase": 16,
+      "maxLevel": 5,
+      "scrapCoins": 100
+    }
+  ],
+  "partLevel": {
+    "statGrowthPerLevel": 0.25,
+    "upgradeCost": {
+      "base": 20,
+      "growth": 1.6,
+      "rarityMult": {
+        "common": 1,
+        "uncommon": 1.5,
+        "rare": 2.2,
+        "epic": 3.2,
+        "legendary": 4.5
+      }
+    }
+  },
+  "race": {
+    "weights": {
+      "topSpeed": 1.0,
+      "accel": 0.6,
+      "grip": 0.6
+    },
+    "speedPerPower": 1.0,
+    "noise": 0.3,
+    "boostChancePerPointPerSec": 0.006,
+    "boostSpeedMult": 1.35,
+    "boostDurationSec": 1.5,
+    "placeRewardMult": [
+      1.0,
+      0.6,
+      0.35,
+      0.2
+    ]
+  },
+  "campaign": {
+    "finalStageWins": 3
+  },
+  "stages": [
+    {
+      "id": "s1",
+      "name": "Cais da Ferrugem",
+      "district": "Docas",
+      "trackLength": 820,
+      "rivals": [
+        {
+          "name": "Zeca Graxa",
+          "sprite": "car_rival_a",
+          "power": 21.7,
+          "boost": 5
+        },
+        {
+          "name": "Bia Faísca",
+          "sprite": "car_rival_b",
+          "power": 20.6,
+          "boost": 5
+        },
+        {
+          "name": "Tonho Pistão",
+          "sprite": "car_rival_c",
+          "power": 19.5,
+          "boost": 5
+        }
+      ],
+      "coins": [
+        20,
+        30
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t1"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t1e"
+      },
+      "unlock": {
+        "prevStageWins": 0
+      }
+    },
+    {
+      "id": "s2",
+      "name": "Rua dos Guindastes",
+      "district": "Docas",
+      "trackLength": 1330,
+      "rivals": [
+        {
+          "name": "Lu Neblina",
+          "sprite": "car_rival_a",
+          "power": 35.0,
+          "boost": 6
+        },
+        {
+          "name": "Dedé Catraca",
+          "sprite": "car_rival_b",
+          "power": 33.2,
+          "boost": 6
+        },
+        {
+          "name": "Nina Ferrolho",
+          "sprite": "car_rival_c",
+          "power": 31.5,
+          "boost": 6
+        }
+      ],
+      "coins": [
+        25,
+        40
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t1"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t1e"
+      },
+      "unlock": {
+        "prevStageWins": 4
+      }
+    },
+    {
+      "id": "s3",
+      "name": "Armazém Nove",
+      "district": "Docas",
+      "trackLength": 1440,
+      "rivals": [
+        {
+          "name": "Juca Vela",
+          "sprite": "car_rival_a",
+          "power": 38.0,
+          "boost": 7
+        },
+        {
+          "name": "Ritinha Biela",
+          "sprite": "car_rival_b",
+          "power": 36.1,
+          "boost": 7
+        },
+        {
+          "name": "Gaúcho Turbina",
+          "sprite": "car_rival_c",
+          "power": 34.2,
+          "boost": 7
+        }
+      ],
+      "coins": [
+        35,
+        50
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t1"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t2e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    },
+    {
+      "id": "s4",
+      "name": "Avenida dos Letreiros",
+      "district": "Centro Velho",
+      "trackLength": 1650,
+      "rivals": [
+        {
+          "name": "Marta Escapamento",
+          "sprite": "car_rival_a",
+          "power": 43.5,
+          "boost": 8
+        },
+        {
+          "name": "Pepe Embreagem",
+          "sprite": "car_rival_b",
+          "power": 41.3,
+          "boost": 8
+        },
+        {
+          "name": "Cida Centelha",
+          "sprite": "car_rival_c",
+          "power": 39.1,
+          "boost": 8
+        }
+      ],
+      "coins": [
+        45,
+        65
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t2"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t2e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    },
+    {
+      "id": "s5",
+      "name": "Viaduto do Relógio",
+      "district": "Centro Velho",
+      "trackLength": 1750,
+      "rivals": [
+        {
+          "name": "Russo Diesel",
+          "sprite": "car_rival_a",
+          "power": 46.0,
+          "boost": 9
+        },
+        {
+          "name": "Kika Rolamento",
+          "sprite": "car_rival_b",
+          "power": 43.7,
+          "boost": 9
+        },
+        {
+          "name": "Beto Asfalto",
+          "sprite": "car_rival_c",
+          "power": 41.4,
+          "boost": 9
+        }
+      ],
+      "coins": [
+        55,
+        80
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t2"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t3e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    },
+    {
+      "id": "s6",
+      "name": "Largo da Feira",
+      "district": "Centro Velho",
+      "trackLength": 2090,
+      "rivals": [
+        {
+          "name": "Neusa Válvula",
+          "sprite": "car_rival_a",
+          "power": 55.0,
+          "boost": 10
+        },
+        {
+          "name": "Tita Cromada",
+          "sprite": "car_rival_b",
+          "power": 52.2,
+          "boost": 10
+        },
+        {
+          "name": "Duda Cárter",
+          "sprite": "car_rival_c",
+          "power": 49.5,
+          "boost": 10
+        }
+      ],
+      "coins": [
+        70,
+        100
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t3"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t3e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    },
+    {
+      "id": "s7",
+      "name": "Túnel da Matriz",
+      "district": "Centro Velho",
+      "trackLength": 2260,
+      "rivals": [
+        {
+          "name": "Vovó Calota",
+          "sprite": "car_rival_a",
+          "power": 59.5,
+          "boost": 11
+        },
+        {
+          "name": "Sombra",
+          "sprite": "car_rival_b",
+          "power": 56.5,
+          "boost": 11
+        },
+        {
+          "name": "Rei do Morro",
+          "sprite": "car_rival_c",
+          "power": 53.6,
+          "boost": 11
+        }
+      ],
+      "coins": [
+        85,
+        120
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t3"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t3e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    },
+    {
+      "id": "s8",
+      "name": "Curvas do Mirante",
+      "district": "Alto da Serra",
+      "trackLength": 2510,
+      "rivals": [
+        {
+          "name": "Mestre Farol",
+          "sprite": "car_rival_a",
+          "power": 66.0,
+          "boost": 12
+        },
+        {
+          "name": "Dona Serra",
+          "sprite": "car_rival_b",
+          "power": 62.7,
+          "boost": 12
+        },
+        {
+          "name": "Barão do Mirante",
+          "sprite": "car_rival_c",
+          "power": 59.4,
+          "boost": 12
+        }
+      ],
+      "coins": [
+        100,
+        145
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t4"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t4e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    },
+    {
+      "id": "s9",
+      "name": "Estrada das Antenas",
+      "district": "Alto da Serra",
+      "trackLength": 2680,
+      "rivals": [
+        {
+          "name": "Capitã Antena",
+          "sprite": "car_rival_a",
+          "power": 70.5,
+          "boost": 13
+        },
+        {
+          "name": "Fantasma da Serra",
+          "sprite": "car_rival_b",
+          "power": 67.0,
+          "boost": 13
+        },
+        {
+          "name": "Lobo do Cume",
+          "sprite": "car_rival_c",
+          "power": 63.5,
+          "boost": 13
+        }
+      ],
+      "coins": [
+        120,
+        170
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t4"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t4e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    },
+    {
+      "id": "s10",
+      "name": "Cume do Farol",
+      "district": "Alto da Serra",
+      "trackLength": 2790,
+      "rivals": [
+        {
+          "name": "Magrão Nitro",
+          "sprite": "car_rival_a",
+          "power": 73.5,
+          "boost": 14
+        },
+        {
+          "name": "Iara Relâmpago",
+          "sprite": "car_rival_b",
+          "power": 69.8,
+          "boost": 14
+        },
+        {
+          "name": "O Farol",
+          "sprite": "car_rival_c",
+          "power": 66.2,
+          "boost": 14
+        }
+      ],
+      "coins": [
+        140,
+        200
+      ],
+      "inRace": {
+        "drops": [
+          2,
+          3
+        ],
+        "table": "t4"
+      },
+      "endLoot": {
+        "rolls": 1,
+        "maxPlace": 2,
+        "table": "t4e"
+      },
+      "unlock": {
+        "prevStageWins": 3
+      }
+    }
+  ],
+  "lootTables": {
+    "t1": [
+      {
+        "weight": 45,
+        "kind": "coins",
+        "amount": [
+          8,
+          16
+        ]
+      },
+      {
+        "weight": 45,
+        "kind": "part",
+        "rarity": "common",
+        "slot": "any"
+      },
+      {
+        "weight": 10,
+        "kind": "part",
+        "rarity": "uncommon",
+        "slot": "any"
+      }
+    ],
+    "t1e": [
+      {
+        "weight": 20,
+        "kind": "coins",
+        "amount": [
+          15,
+          25
+        ]
+      },
+      {
+        "weight": 40,
+        "kind": "part",
+        "rarity": "common",
+        "slot": "any"
+      },
+      {
+        "weight": 32,
+        "kind": "part",
+        "rarity": "uncommon",
+        "slot": "any"
+      },
+      {
+        "weight": 8,
+        "kind": "part",
+        "rarity": "rare",
+        "slot": "any"
+      }
+    ],
+    "t2": [
+      {
+        "weight": 30,
+        "kind": "coins",
+        "amount": [
+          15,
+          30
+        ]
+      },
+      {
+        "weight": 25,
+        "kind": "part",
+        "rarity": "common",
+        "slot": "any"
+      },
+      {
+        "weight": 30,
+        "kind": "part",
+        "rarity": "uncommon",
+        "slot": "any"
+      },
+      {
+        "weight": 15,
+        "kind": "part",
+        "rarity": "rare",
+        "slot": "any"
+      }
+    ],
+    "t2e": [
+      {
+        "weight": 10,
+        "kind": "coins",
+        "amount": [
+          25,
+          40
+        ]
+      },
+      {
+        "weight": 10,
+        "kind": "part",
+        "rarity": "common",
+        "slot": "any"
+      },
+      {
+        "weight": 35,
+        "kind": "part",
+        "rarity": "uncommon",
+        "slot": "any"
+      },
+      {
+        "weight": 35,
+        "kind": "part",
+        "rarity": "rare",
+        "slot": "any"
+      },
+      {
+        "weight": 10,
+        "kind": "part",
+        "rarity": "epic",
+        "slot": "any"
+      }
+    ],
+    "t3": [
+      {
+        "weight": 25,
+        "kind": "coins",
+        "amount": [
+          25,
+          45
+        ]
+      },
+      {
+        "weight": 10,
+        "kind": "part",
+        "rarity": "common",
+        "slot": "any"
+      },
+      {
+        "weight": 30,
+        "kind": "part",
+        "rarity": "uncommon",
+        "slot": "any"
+      },
+      {
+        "weight": 25,
+        "kind": "part",
+        "rarity": "rare",
+        "slot": "any"
+      },
+      {
+        "weight": 10,
+        "kind": "part",
+        "rarity": "epic",
+        "slot": "any"
+      }
+    ],
+    "t3e": [
+      {
+        "weight": 10,
+        "kind": "coins",
+        "amount": [
+          40,
+          60
+        ]
+      },
+      {
+        "weight": 25,
+        "kind": "part",
+        "rarity": "uncommon",
+        "slot": "any"
+      },
+      {
+        "weight": 40,
+        "kind": "part",
+        "rarity": "rare",
+        "slot": "any"
+      },
+      {
+        "weight": 25,
+        "kind": "part",
+        "rarity": "epic",
+        "slot": "any"
+      }
+    ],
+    "t4": [
+      {
+        "weight": 20,
+        "kind": "coins",
+        "amount": [
+          35,
+          60
+        ]
+      },
+      {
+        "weight": 25,
+        "kind": "part",
+        "rarity": "uncommon",
+        "slot": "any"
+      },
+      {
+        "weight": 30,
+        "kind": "part",
+        "rarity": "rare",
+        "slot": "any"
+      },
+      {
+        "weight": 20,
+        "kind": "part",
+        "rarity": "epic",
+        "slot": "any"
+      },
+      {
+        "weight": 5,
+        "kind": "part",
+        "rarity": "legendary",
+        "slot": "any"
+      }
+    ],
+    "t4e": [
+      {
+        "weight": 10,
+        "kind": "coins",
+        "amount": [
+          50,
+          80
+        ]
+      },
+      {
+        "weight": 40,
+        "kind": "part",
+        "rarity": "rare",
+        "slot": "any"
+      },
+      {
+        "weight": 38,
+        "kind": "part",
+        "rarity": "epic",
+        "slot": "any"
+      },
+      {
+        "weight": 12,
+        "kind": "part",
+        "rarity": "legendary",
+        "slot": "any"
+      }
+    ]
+  }
+}

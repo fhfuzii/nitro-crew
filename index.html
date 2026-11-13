@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nitro Crew</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="brand">NITRO CREW</div>
+    <div id="stageName"></div>
+    <div id="power"></div>
+    <div class="coins"><span id="coins">0</span>$</div>
+    <button id="speed" title="Velocidade da simulação">1x</button>
+  </header>
+  <main>
+    <canvas id="race" aria-label="Corrida"></canvas>
+    <p id="fatal"></p>
+    <nav>
+      <button data-tab="garage">Garagem</button>
+      <button data-tab="stages">Fases</button>
+      <button data-tab="log">Registro</button>
+    </nav>
+    <section id="panel"></section>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
