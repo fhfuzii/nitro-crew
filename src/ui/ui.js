@@ -1,6 +1,6 @@
 // Interface HTML: cabeçalho, garagem, fases e registro.
-import { SLOT_KEYS, statTotals, powerOf, partBonus, upgradeCost, rarityOf, rarityIndex, tableOdds } from '../engine/economy.js';
-import { isUnlocked, resetSave, addLog } from '../engine/state.js';
+import { SLOT_KEYS, statTotals, powerOf, partBonus, upgradeCost, rarityOf, rarityIndex, tableOdds, makePart } from '../engine/economy.js';
+import { isUnlocked, resetSave, addLog, receivePart } from '../engine/state.js';
 import { spriteDataURL } from '../engine/sprites.js';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -62,6 +62,15 @@ export function initUI(game, { onChange }) {
       if (!part || cost === null || state.coins < cost) return;
       state.coins -= cost;
       part.level++;
+    } else if (act === 'buy') {
+      const item = shopItems().find(it => it.id === b.dataset.item);
+      if (!item || !shopOpen(item) || state.shopBought.includes(item.id) || state.coins < item.price) return;
+      state.coins -= item.price;
+      state.shopBought.push(item.id);
+      const part = makePart(balance, item.slot, item.rarity);
+      part.level = item.level ?? 1;
+      const where = receivePart(balance, state, part);
+      addLog(state, `Loja: comprou ${game.labels.loot({ kind: 'part', part })} por ${item.price}$${where === 'equipped' ? ' (equipada)' : ''}`, part.rarity);
     } else if (act === 'stage') {
       state.currentStage = b.dataset.stage;
       game.restartRace();
@@ -129,6 +138,47 @@ export function initUI(game, { onChange }) {
       </div>`;
   }
 
+  function shopItems() { return balance.shop?.items ?? []; }
+
+  function shopOpen(item) {
+    const idx = balance.stages.findIndex(s => s.id === item.unlock?.stage);
+    return idx < 0 || isUnlocked(balance, state, idx);
+  }
+
+  function shop() {
+    const items = shopItems();
+    if (!items.length) return '<p class="dim">A loja ainda está sendo abastecida.</p>';
+    const order = it => (state.shopBought.includes(it.id) ? 2 : shopOpen(it) ? 0 : 1);
+    const sorted = [...items].sort((a, b) => order(a) - order(b) || a.price - b.price);
+    const cards = sorted.map(it => {
+      const r = rarityOf(balance, it.rarity);
+      const def = balance.slots[it.slot];
+      const fake = { slot: it.slot, rarity: it.rarity, level: it.level ?? 1 };
+      const bonus = partBonus(balance, fake);
+      const cur = state.equipped[it.slot];
+      const diff = bonus - (cur ? partBonus(balance, cur) : 0);
+      const bought = state.shopBought.includes(it.id);
+      const open = shopOpen(it);
+      let action;
+      if (bought) action = '<span class="tag">comprado</span>';
+      else if (!open) {
+        const st = balance.stages.find(s => s.id === it.unlock.stage);
+        action = `<span class="dim">libera em<br>${esc(st ? st.name : it.unlock.stage)}</span>`;
+      } else {
+        const missing = it.price - state.coins;
+        action = `<span class="buy"><button data-act="buy" data-item="${esc(it.id)}" title="Comprar por ${it.price}$" ${missing > 0 ? 'disabled' : ''}>${it.price.toLocaleString('pt-BR')}$</button>
+          ${missing > 0 ? `<span class="dim">faltam ${missing.toLocaleString('pt-BR')}$</span>` : ''}</span>`;
+      }
+      return `<div class="card item r-${it.rarity} ${!open && !bought ? 'locked' : ''} ${bought ? 'sold' : ''}"><img src="${icons[it.slot]}" alt="">
+        <div><b>${esc(def.name)}</b> <span class="rar">${esc(r.name)}</span>
+        <div class="dim">nível ${fake.level} · ${statIcon(def.stat)}+${fmt(bonus)} ${esc(statName(def.stat))}</div>
+        ${bought ? '' : `<div class="dim"><span class="${diff > 0 ? 'good' : 'bad'}">${diff > 0 ? '+' : ''}${fmt(diff)}</span> vs atual</div>`}</div>
+        ${action}</div>`;
+    }).join('');
+    return `<p class="dim">Peças de alto desempenho. Cada uma pode ser comprada uma vez; novas peças chegam conforme você libera fases.</p>
+      <div class="grid">${cards}</div>`;
+  }
+
   function stages() {
     return `<div class="grid">${balance.stages.map((st, i) => {
       const open = isUnlocked(balance, state, i);
@@ -165,7 +215,7 @@ export function initUI(game, { onChange }) {
   function refresh() {
     header();
     document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    $('panel').innerHTML = tab === 'garage' ? garage() : tab === 'stages' ? stages() : log();
+    $('panel').innerHTML = tab === 'garage' ? garage() : tab === 'shop' ? shop() : tab === 'stages' ? stages() : log();
   }
 
   return { refresh };

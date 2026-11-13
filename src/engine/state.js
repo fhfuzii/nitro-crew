@@ -13,6 +13,7 @@ export function newState(balance) {
     stageWins: {},
     stageRaces: {},
     currentStage: balance.stages[0].id,
+    shopBought: [],
     autoAdvance: true,
     autoEquip: true,
     nextPartId: 1,
@@ -28,6 +29,7 @@ export function load(balance) {
       const s = JSON.parse(raw);
       if (s && s.v === SAVE_VERSION) {
         if (!balance.stages.some(st => st.id === s.currentStage)) s.currentStage = balance.stages[0].id;
+        if (!Array.isArray(s.shopBought)) s.shopBought = []; // saves anteriores à loja
         setNextPartId(s.nextPartId || 1);
         return s;
       }

@@ -49,6 +49,8 @@ h3 { font-size: 10px; color: var(--accent); margin: 18px 0 8px; display: flex; g
 .tag { color: var(--accent); font-size: 8px; }
 .stats { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .stat { display: inline-flex; align-items: center; gap: 6px; }
+.buy { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; }
+.card.sold { opacity: .55; }
 button.ib { display: inline-flex; align-items: center; gap: 6px; }
 button.ib.up { color: var(--good); }
 img.bi { width: 20px; height: 20px; image-rendering: pixelated; display: block; }

@@ -20,15 +20,25 @@ Modelo da corrida (imita o motor):
   boost * boostChancePerPointPerSec de ativar por boostDurationSec; durante o
   nitro a velocidade-alvo é multiplicada por boostSpeedMult.
 - Todos largam parados (v = 0).
-- Colocação = ordem de chegada em trackLength. A corrida acaba quando o último
-  cruza ou em 2x o tempo do primeiro (o que vier antes); quem não chegou fica
-  atrás, ordenado pela distância percorrida.
+- Alvo limitado a >= 0 (contrato).
+- A corrida acaba no instante em que o jogador cruza trackLength; colocação =
+  carros que já cruzaram + 1 (empate no mesmo quadro favorece o jogador).
 
 Jogador guloso:
 - Depois de cada corrida: equipa a peça de maior bônus em cada slot (empate
   mantém a atual), desmonta todas as outras peças em scrapCoins.
 - Gasta moedas no upgrade com maior ganho de potência por moeda; se não pode
   pagar esse upgrade, guarda as moedas (não compra um pior).
+- Loja (balance.shop, contrato 3.1), avaliada depois de equipar e antes dos
+  upgrades: entre os itens liberados e ainda não comprados, pega o de maior
+  ganho de potência por moeda (ganho = bônus novo - bônus equipado no slot,
+  vezes o peso do stat; itens de turbo têm ganho 0 e nunca são comprados).
+  Se essa razão for maior que a do melhor upgrade:
+    * tem moedas -> compra (a peça antiga é desmontada) e reavalia;
+    * faltam <= SAVE_HORIZON_RACES x renda média das últimas 5 corridas ->
+      economiza: não gasta em upgrade nesta rodada;
+    * mais longe que isso -> ignora a loja e faz upgrades normalmente.
+  Com --no-shop a loja é ignorada.
 - Sempre corre a fase mais alta liberada.
 - Tempo de jogo = soma da duração simulada das corridas + 5 s entre corridas.
 """
@@ -44,6 +54,8 @@ DT = 1.0 / 60.0
 TAU = 0.5
 ALPHA = 1.0 - math.exp(-DT / TAU)
 GAP_BETWEEN_RACES = 5.0
+SAVE_HORIZON_RACES = 10   # economiza para item da loja a <= 10 corridas de renda
+INCOME_WINDOW = 5         # renda média = últimas 5 corridas (moedas + loot de moedas + sucata)
 STATS = ("topSpeed", "accel", "grip", "boost")
 # Diagnóstico: corridas em que algum carro terminou um segundo com velocidade < 0
 # (o contrato não limita o alvo a >= 0; com noise alto isso aparece como "ré").
@@ -65,6 +77,8 @@ class Balance:
         self.tables = data["lootTables"]
         self.pl = data["partLevel"]
         self.final_wins = data.get("campaign", {}).get("finalStageWins", 1)
+        self.stage_index = {st["id"]: i for i, st in enumerate(self.stages)}
+        self.shop = data.get("shop", {}).get("items", [])
 
     def part_bonus(self, rarity, level):
         r = self.rar_by_id[rarity]
@@ -213,6 +227,8 @@ class Player:
         self.bal = bal
         self.equipped = {s: None for s in SLOT_KEYS}
         self.coins = 0
+        self.bought = set()
+        self.saving = False
 
     def totals(self):
         return self.bal.stat_totals(self.equipped)
@@ -234,9 +250,67 @@ class Player:
             else:
                 self.coins += bal.rar_by_id[p["rarity"]]["scrapCoins"]
 
+    def best_upgrade(self):
+        bal = self.bal
+        best = None
+        for slot, part in self.equipped.items():
+            if part is None:
+                continue
+            w = bal.stat_weight(slot)
+            if w <= 0:
+                continue
+            r = bal.rar_by_id[part["rarity"]]
+            if part["level"] >= r["maxLevel"]:
+                continue
+            gain = r["statBase"] * bal.pl["statGrowthPerLevel"] * w
+            cost = bal.upgrade_cost(part["rarity"], part["level"])
+            ratio = gain / max(cost, 1)
+            if best is None or ratio > best[0]:
+                best = (ratio, part, cost)
+        return best
+
+    def shop_step(self, unlocked_idx, income):
+        """Compra ou economiza na loja. Retorna os ids comprados agora."""
+        bal = self.bal
+        bought_now = []
+        self.saving = False
+        while True:
+            best = None
+            for it in bal.shop:
+                if it["id"] in self.bought:
+                    continue
+                if bal.stage_index[it["unlock"]["stage"]] > unlocked_idx:
+                    continue
+                lvl = it.get("level", 1)
+                cur = self.equipped[it["slot"]]
+                cur_b = bal.part_bonus(cur["rarity"], cur["level"]) if cur else 0.0
+                gain = (bal.part_bonus(it["rarity"], lvl) - cur_b) * bal.stat_weight(it["slot"])
+                if gain <= 0:
+                    continue
+                ratio = gain / it["price"]
+                if best is None or ratio > best[0]:
+                    best = (ratio, it)
+            if best is None:
+                return bought_now
+            up = self.best_upgrade()
+            if up is not None and up[0] >= best[0]:
+                return bought_now
+            it = best[1]
+            if self.coins >= it["price"]:
+                self.coins -= it["price"]
+                self.bought.add(it["id"])
+                bought_now.append(it["id"])
+                self.receive_parts([{"rarity": it["rarity"], "slot": it["slot"], "level": it.get("level", 1)}])
+                continue
+            if it["price"] - self.coins <= SAVE_HORIZON_RACES * income:
+                self.saving = True
+            return bought_now
+
     def spend(self):
         bal = self.bal
         upgrades = 0
+        if self.saving:
+            return 0
         while True:
             best = None
             for slot, part in self.equipped.items():
@@ -260,9 +334,10 @@ class Player:
             upgrades += 1
 
 
-def simulate_player(bal, rng, stats):
+def simulate_player(bal, rng, stats, use_shop=True, shop_log=None):
     """Simula um jogador até concluir a campanha. Acumula em stats[stage_idx]."""
     pl = Player(bal)
+    incomes = []
     nst = len(bal.stages)
     unlocked = 0
     wins = [0] * nst
@@ -275,6 +350,7 @@ def simulate_player(bal, rng, stats):
         s = stats[si]
         if s["_races_here"] is None:
             s["_races_here"] = 0
+        coins_before = pl.coins
         p_power = pl.power()
         if wins[si] == 0 and s["_arrive_power"] is None:
             s["_arrive_power"] = p_power
@@ -309,6 +385,14 @@ def simulate_player(bal, rng, stats):
                 if val["rarity"] == "legendary" and first_legendary_stage is None:
                     first_legendary_stage = si
         pl.receive_parts(got_parts)
+        incomes.append(pl.coins - coins_before)
+        s["income"].append(incomes[-1])
+        if use_shop and bal.shop:
+            recent = incomes[-INCOME_WINDOW:]
+            for iid in pl.shop_step(unlocked, sum(recent) / len(recent)):
+                s["shop_buys"] += 1
+                if shop_log is not None:
+                    shop_log.setdefault(iid, []).append((si, total_races))
         s["upgrades"] += pl.spend()
         if my == 0:
             wins[si] += 1
@@ -349,6 +433,7 @@ def new_stats(bal):
             "durations": [], "unlock_races": [], "unlock_time": [],
             "power_at_unlock": [], "arrive_power": [],
             "_races_here": None, "_arrive_power": None,
+            "income": [], "shop_buys": 0,
         }
         for _ in bal.stages
     ]
@@ -381,6 +466,7 @@ def main():
     ap.add_argument("--balance", default=os.path.join(here, "..", "data", "balance.json"))
     ap.add_argument("--players", type=int, default=200)
     ap.add_argument("--seed", type=int, default=12345)
+    ap.add_argument("--no-shop", action="store_true", help="ignora balance.shop")
     args = ap.parse_args()
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -395,8 +481,10 @@ def main():
     stats = new_stats(bal)
     totals = []
     race_counts = []
+    shop_log = {}
+    use_shop = not args.no_shop
     for _ in range(args.players):
-        t, n = simulate_player(bal, rng, stats)
+        t, n = simulate_player(bal, rng, stats, use_shop, shop_log)
         totals.append(t)
         race_counts.append(n)
 
@@ -405,14 +493,16 @@ def main():
     first_leg = stats[-1].get("_first_leg", [])
     n = args.players
 
-    print(f"Nitro Crew - simulacao: {n} jogadores, semente {args.seed}")
+    loja = "LIGADA" if (use_shop and bal.shop) else "DESLIGADA"
+    print(f"Nitro Crew - simulacao: {n} jogadores, semente {args.seed}, loja {loja}")
     print(f"Carro base na fase 1: vitoria em {stage1_wr:.1f}% das corridas (2000 corridas)")
     print()
     hdr = ("| Fase | Nome | Corridas p/ liberar (media / p10-p90) | Tempo acum. (min) | "
            "Pot. jogador chegada -> liberacao | Pot. rivais (max) | Vitoria % | Duracao corrida (s) | "
-           "Pecas/jogador " + " ".join(rar_short.get(r, r) for r in rar_ids) + " | 1a lendaria (% jog.) |")
+           "Pecas/jogador " + " ".join(rar_short.get(r, r) for r in rar_ids) + " | 1a lendaria (% jog.) | "
+           "Renda/corrida | Compras loja/jog. |")
     print(hdr)
-    print("|" + "---|" * 10)
+    print("|" + "---|" * 12)
     for i, (st, s) in enumerate(zip(bal.stages, stats)):
         ur = s["unlock_races"]
         races = s["races"] or 1
@@ -424,7 +514,8 @@ def main():
             f"| {i + 1} | {st['name']} | {statistics.mean(ur):.1f} / {pct(ur, .1):.0f}-{pct(ur, .9):.0f} | "
             f"{statistics.mean(s['unlock_time']) / 60:.1f} | "
             f"{statistics.mean(s['arrive_power']):.1f} -> {statistics.mean(s['power_at_unlock']):.1f} | "
-            f"{max(r['power'] for r in st['rivals']):.1f} | {wr:.0f} | {dur:.1f} | {parts} | {fl:.0f} |"
+            f"{max(r['power'] for r in st['rivals']):.1f} | {wr:.0f} | {dur:.1f} | {parts} | {fl:.0f} | "
+            f"{statistics.mean(s['income']):.0f} | {s['shop_buys'] / n:.2f} |"
         )
     print()
     no_leg = 100.0 * sum(1 for x in first_leg if x is None) / n
@@ -437,6 +528,18 @@ def main():
           f"p95 {pct(all_d, .95):.1f} s, max {max(all_d):.1f} s")
     print(f"Corridas com algum carro em marcha a re (v < 0 ao fim de um segundo): "
           f"{100.0 * REVERSE['with_reverse'] / max(REVERSE['races'], 1):.2f}%")
+    if bal.shop:
+        print()
+        print("Loja: corridas de economia = preco / renda media por corrida na fase em que o item libera")
+        print("| Item | Raridade nv | Libera na fase | Preco | Corridas de economia | % jogadores que compram | Fase media da compra |")
+        print("|---|---|---|---|---|---|---|")
+        for it in bal.shop:
+            si = bal.stage_index[it["unlock"]["stage"]]
+            inc = statistics.mean(stats[si]["income"]) if stats[si]["income"] else float("nan")
+            log = shop_log.get(it["id"], [])
+            fase = f"{statistics.mean(x[0] for x in log) + 1:.1f}" if log else "-"
+            print(f"| {it['id']} | {it['rarity']} {it.get('level', 1)} | {si + 1} | {it['price']} | "
+                  f"{it['price'] / inc:.1f} | {100.0 * len(log) / n:.0f}% | {fase} |")
     print("Legenda pecas: C=comum I=incomum R=rara E=epica L=lendaria (media por jogador obtidas na fase)")
 
 

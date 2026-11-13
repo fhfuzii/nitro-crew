@@ -128,6 +128,22 @@ Campos obrigatórios:
 - Peça sorteada com `"slot": "any"` escolhe um dos 4 slots com chance igual.
 - Peças repetidas podem ser desmontadas por `scrapCoins` moedas.
 
+## 3.1 Loja (`balance.shop`)
+
+Catálogo fixo de peças caras. Cada item pode ser comprado **uma vez**; aparece à venda quando a fase `unlock.stage` estiver liberada (antes disso aparece bloqueado, com o nome da fase).
+
+```jsonc
+"shop": {
+  "items": [
+    { "id": "sh_engine_rare", "slot": "engine", "rarity": "rare", "level": 1, "price": 900, "unlock": { "stage": "s3" } }
+  ]
+}
+```
+
+- `id` único e estável (o save guarda os ids comprados; não renomeie depois de publicado).
+- `slot` é um dos 4 slots (não aceita `"any"`); `level` é o nível inicial da peça (padrão 1).
+- A peça comprada entra como qualquer prêmio: equipa sozinha se for melhor e o "equipar automaticamente" estiver ligado; senão vai para a garagem.
+
 ## 4. Save (`localStorage`, chave `nitro-crew-save`)
 
 Responsabilidade do motor; os agentes não mexem.
