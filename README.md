@@ -26,4 +26,4 @@ Abra http://localhost:8080.
 
 ## Publicação
 
-Cada push na `main` publica no GitHub Pages (`.github/workflows/pages.yml`). Ative em *Settings → Pages → Source: GitHub Actions*.
+Cada push na `main` publica em https://fhfuzii.github.io/nitro-crew/ (GitHub Pages servindo a raiz da branch `main`).

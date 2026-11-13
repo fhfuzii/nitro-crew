@@ -8,7 +8,9 @@ Responda em português do Brasil.
 ## Stack
 - HTML + JavaScript puro (módulos ES), sem build e sem dependências. Canvas 2D para a corrida, HTML/CSS para a garagem.
 - Rodar local: `python -m http.server 8080` na raiz do repositório e abrir http://localhost:8080 (módulos ES não funcionam via `file://`).
-- Publicação: GitHub Pages via `.github/workflows/pages.yml` a cada push na `main`.
+- Repositório: https://github.com/fhfuzii/nitro-crew (conta pessoal `fhfuzii`, não a da Draiver).
+- Publicação: GitHub Pages servindo a raiz da `main` → https://fhfuzii.github.io/nitro-crew/. Não há workflow de CI (o token da conta não tem escopo `workflow`).
+- Antes de commitar mudanças em sprites, rode `python tools/validate_sprites.py`.
 
 ## Divisão do trabalho
 Leia `docs/contracts.md` antes de mexer em qualquer coisa. Ele define o que cada área entrega e o que o motor lê.
