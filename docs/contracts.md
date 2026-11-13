@@ -119,7 +119,7 @@ Campos obrigatórios:
 
 - `statTotal[s] = baseCar[s] + Σ bônus das peças equipadas cujo slot.stat == s`
 - `bônus da peça = rarity.statBase * (1 + partLevel.statGrowthPerLevel * (nível - 1))`
-- `potência = Σ statTotal[s] * race.weights[s]` (boost não entra na potência)
+- `potência = Σ statTotal[s] * race.weights[s]`, somando todo stat que tiver peso em `race.weights` — inclusive `boost` (o nitro conta na potência **e** continua dando a chance de arrancada abaixo).
 - Velocidade a cada segundo: `max(0, potência * speedPerPower * (1 + noise * N(0,1)))`, suavizada; durante o nitro, multiplicada por `boostSpeedMult`.
 - Chance de nitro por segundo: `boost * boostChancePerPointPerSec`.
 - Rivais usam `power` e `boost` diretos.

@@ -79,7 +79,8 @@
     "weights": {
       "topSpeed": 1.0,
       "accel": 0.6,
-      "grip": 0.6
+      "grip": 0.6,
+      "boost": 0.45
     },
     "speedPerPower": 1.0,
     "noise": 0.3,
@@ -101,24 +102,24 @@
       "id": "s1",
       "name": "Cais da Ferrugem",
       "district": "Docas",
-      "trackLength": 820,
+      "trackLength": 990,
       "rivals": [
         {
           "name": "Zeca Graxa",
           "sprite": "car_rival_a",
-          "power": 21.7,
+          "power": 26.1,
           "boost": 5
         },
         {
           "name": "Bia Faísca",
           "sprite": "car_rival_b",
-          "power": 20.6,
+          "power": 24.8,
           "boost": 5
         },
         {
           "name": "Tonho Pistão",
           "sprite": "car_rival_c",
-          "power": 19.5,
+          "power": 23.5,
           "boost": 5
         }
       ],
@@ -146,24 +147,24 @@
       "id": "s2",
       "name": "Rua dos Guindastes",
       "district": "Docas",
-      "trackLength": 1330,
+      "trackLength": 1580,
       "rivals": [
         {
           "name": "Lu Neblina",
           "sprite": "car_rival_a",
-          "power": 35.0,
+          "power": 41.5,
           "boost": 6
         },
         {
           "name": "Dedé Catraca",
           "sprite": "car_rival_b",
-          "power": 33.2,
+          "power": 39.4,
           "boost": 6
         },
         {
           "name": "Nina Ferrolho",
           "sprite": "car_rival_c",
-          "power": 31.5,
+          "power": 37.4,
           "boost": 6
         }
       ],
@@ -191,24 +192,24 @@
       "id": "s3",
       "name": "Armazém Nove",
       "district": "Docas",
-      "trackLength": 1440,
+      "trackLength": 1790,
       "rivals": [
         {
           "name": "Juca Vela",
           "sprite": "car_rival_a",
-          "power": 38.0,
+          "power": 47.0,
           "boost": 7
         },
         {
           "name": "Ritinha Biela",
           "sprite": "car_rival_b",
-          "power": 36.1,
+          "power": 44.6,
           "boost": 7
         },
         {
           "name": "Gaúcho Turbina",
           "sprite": "car_rival_c",
-          "power": 34.2,
+          "power": 42.3,
           "boost": 7
         }
       ],
@@ -236,24 +237,24 @@
       "id": "s4",
       "name": "Avenida dos Letreiros",
       "district": "Centro Velho",
-      "trackLength": 1650,
+      "trackLength": 2030,
       "rivals": [
         {
           "name": "Marta Escapamento",
           "sprite": "car_rival_a",
-          "power": 43.5,
+          "power": 53.3,
           "boost": 8
         },
         {
           "name": "Pepe Embreagem",
           "sprite": "car_rival_b",
-          "power": 41.3,
+          "power": 50.6,
           "boost": 8
         },
         {
           "name": "Cida Centelha",
           "sprite": "car_rival_c",
-          "power": 39.1,
+          "power": 48.0,
           "boost": 8
         }
       ],
@@ -281,24 +282,24 @@
       "id": "s5",
       "name": "Viaduto do Relógio",
       "district": "Centro Velho",
-      "trackLength": 1750,
+      "trackLength": 2150,
       "rivals": [
         {
           "name": "Russo Diesel",
           "sprite": "car_rival_a",
-          "power": 46.0,
+          "power": 56.5,
           "boost": 9
         },
         {
           "name": "Kika Rolamento",
           "sprite": "car_rival_b",
-          "power": 43.7,
+          "power": 53.7,
           "boost": 9
         },
         {
           "name": "Beto Asfalto",
           "sprite": "car_rival_c",
-          "power": 41.4,
+          "power": 50.9,
           "boost": 9
         }
       ],
@@ -326,24 +327,24 @@
       "id": "s6",
       "name": "Largo da Feira",
       "district": "Centro Velho",
-      "trackLength": 2090,
+      "trackLength": 2550,
       "rivals": [
         {
           "name": "Neusa Válvula",
           "sprite": "car_rival_a",
-          "power": 55.0,
+          "power": 67.0,
           "boost": 10
         },
         {
           "name": "Tita Cromada",
           "sprite": "car_rival_b",
-          "power": 52.2,
+          "power": 63.6,
           "boost": 10
         },
         {
           "name": "Duda Cárter",
           "sprite": "car_rival_c",
-          "power": 49.5,
+          "power": 60.3,
           "boost": 10
         }
       ],
@@ -371,24 +372,24 @@
       "id": "s7",
       "name": "Túnel da Matriz",
       "district": "Centro Velho",
-      "trackLength": 2260,
+      "trackLength": 2770,
       "rivals": [
         {
           "name": "Vovó Calota",
           "sprite": "car_rival_a",
-          "power": 59.5,
+          "power": 73.0,
           "boost": 11
         },
         {
           "name": "Sombra",
           "sprite": "car_rival_b",
-          "power": 56.5,
+          "power": 69.3,
           "boost": 11
         },
         {
           "name": "Rei do Morro",
           "sprite": "car_rival_c",
-          "power": 53.6,
+          "power": 65.7,
           "boost": 11
         }
       ],
@@ -416,24 +417,24 @@
       "id": "s8",
       "name": "Curvas do Mirante",
       "district": "Alto da Serra",
-      "trackLength": 2510,
+      "trackLength": 3060,
       "rivals": [
         {
           "name": "Mestre Farol",
           "sprite": "car_rival_a",
-          "power": 66.0,
+          "power": 80.5,
           "boost": 12
         },
         {
           "name": "Dona Serra",
           "sprite": "car_rival_b",
-          "power": 62.7,
+          "power": 76.5,
           "boost": 12
         },
         {
           "name": "Barão do Mirante",
           "sprite": "car_rival_c",
-          "power": 59.4,
+          "power": 72.5,
           "boost": 12
         }
       ],
@@ -461,24 +462,24 @@
       "id": "s9",
       "name": "Estrada das Antenas",
       "district": "Alto da Serra",
-      "trackLength": 2680,
+      "trackLength": 3270,
       "rivals": [
         {
           "name": "Capitã Antena",
           "sprite": "car_rival_a",
-          "power": 70.5,
+          "power": 86.0,
           "boost": 13
         },
         {
           "name": "Fantasma da Serra",
           "sprite": "car_rival_b",
-          "power": 67.0,
+          "power": 81.7,
           "boost": 13
         },
         {
           "name": "Lobo do Cume",
           "sprite": "car_rival_c",
-          "power": 63.5,
+          "power": 77.4,
           "boost": 13
         }
       ],
@@ -506,24 +507,24 @@
       "id": "s10",
       "name": "Cume do Farol",
       "district": "Alto da Serra",
-      "trackLength": 2790,
+      "trackLength": 3420,
       "rivals": [
         {
           "name": "Magrão Nitro",
           "sprite": "car_rival_a",
-          "power": 73.5,
+          "power": 90.0,
           "boost": 14
         },
         {
           "name": "Iara Relâmpago",
           "sprite": "car_rival_b",
-          "power": 69.8,
+          "power": 85.5,
           "boost": 14
         },
         {
           "name": "O Farol",
           "sprite": "car_rival_c",
-          "power": 66.2,
+          "power": 81.0,
           "boost": 14
         }
       ],
@@ -792,7 +793,7 @@
         "id": "sh_engine_rare",
         "slot": "engine",
         "rarity": "rare",
-        "level": 4,
+        "level": 5,
         "price": 650,
         "unlock": {
           "stage": "s3"
@@ -802,8 +803,8 @@
         "id": "sh_tires_rare",
         "slot": "tires",
         "rarity": "rare",
-        "level": 4,
-        "price": 750,
+        "level": 5,
+        "price": 700,
         "unlock": {
           "stage": "s3"
         }
@@ -812,8 +813,8 @@
         "id": "sh_transmission_rare",
         "slot": "transmission",
         "rarity": "rare",
-        "level": 4,
-        "price": 1000,
+        "level": 5,
+        "price": 800,
         "unlock": {
           "stage": "s4"
         }
@@ -822,18 +823,18 @@
         "id": "sh_turbo_rare",
         "slot": "turbo",
         "rarity": "rare",
-        "level": 3,
-        "price": 800,
+        "level": 5,
+        "price": 600,
         "unlock": {
-          "stage": "s4"
+          "stage": "s3"
         }
       },
       {
         "id": "sh_engine_epic",
         "slot": "engine",
         "rarity": "epic",
-        "level": 3,
-        "price": 1300,
+        "level": 4,
+        "price": 1200,
         "unlock": {
           "stage": "s6"
         }
@@ -842,8 +843,8 @@
         "id": "sh_transmission_epic",
         "slot": "transmission",
         "rarity": "epic",
-        "level": 3,
-        "price": 1500,
+        "level": 4,
+        "price": 1300,
         "unlock": {
           "stage": "s6"
         }
@@ -852,8 +853,8 @@
         "id": "sh_tires_epic",
         "slot": "tires",
         "rarity": "epic",
-        "level": 3,
-        "price": 1700,
+        "level": 4,
+        "price": 1400,
         "unlock": {
           "stage": "s7"
         }
@@ -862,8 +863,8 @@
         "id": "sh_turbo_epic",
         "slot": "turbo",
         "rarity": "epic",
-        "level": 1,
-        "price": 1400,
+        "level": 4,
+        "price": 1300,
         "unlock": {
           "stage": "s7"
         }
@@ -873,7 +874,7 @@
         "slot": "engine",
         "rarity": "legendary",
         "level": 3,
-        "price": 3600,
+        "price": 3300,
         "unlock": {
           "stage": "s9"
         }
@@ -882,8 +883,8 @@
         "id": "sh_turbo_legendary",
         "slot": "turbo",
         "rarity": "legendary",
-        "level": 1,
-        "price": 3000,
+        "level": 3,
+        "price": 2900,
         "unlock": {
           "stage": "s9"
         }
@@ -893,7 +894,7 @@
         "slot": "transmission",
         "rarity": "legendary",
         "level": 3,
-        "price": 3900,
+        "price": 3500,
         "unlock": {
           "stage": "s10"
         }
@@ -903,7 +904,7 @@
         "slot": "tires",
         "rarity": "legendary",
         "level": 3,
-        "price": 3900,
+        "price": 3500,
         "unlock": {
           "stage": "s10"
         }

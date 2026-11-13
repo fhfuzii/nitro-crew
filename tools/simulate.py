@@ -27,12 +27,14 @@ Modelo da corrida (imita o motor):
 Jogador guloso:
 - Depois de cada corrida: equipa a peça de maior bônus em cada slot (empate
   mantém a atual), desmonta todas as outras peças em scrapCoins.
-- Gasta moedas no upgrade com maior ganho de potência por moeda; se não pode
+- Gasta moedas no upgrade com maior ganho de potência por moeda (potência =
+  soma de todo stat com peso em race.weights, inclusive boost); se não pode
   pagar esse upgrade, guarda as moedas (não compra um pior).
 - Loja (balance.shop, contrato 3.1), avaliada depois de equipar e antes dos
   upgrades: entre os itens liberados e ainda não comprados, pega o de maior
   ganho de potência por moeda (ganho = bônus novo - bônus equipado no slot,
-  vezes o peso do stat; itens de turbo têm ganho 0 e nunca são comprados).
+  vezes o peso do stat em race.weights; o turbo entra como qualquer slot se
+  "boost" tiver peso).
   Se essa razão for maior que a do melhor upgrade:
     * tem moedas -> compra (a peça antiga é desmontada) e reavalia;
     * faltam <= SAVE_HORIZON_RACES x renda média das últimas 5 corridas ->
@@ -229,6 +231,7 @@ class Player:
         self.coins = 0
         self.bought = set()
         self.saving = False
+        self.slot_upgrades = {s: 0 for s in SLOT_KEYS}
 
     def totals(self):
         return self.bal.stat_totals(self.equipped)
@@ -266,7 +269,7 @@ class Player:
             cost = bal.upgrade_cost(part["rarity"], part["level"])
             ratio = gain / max(cost, 1)
             if best is None or ratio > best[0]:
-                best = (ratio, part, cost)
+                best = (ratio, part, cost, slot)
         return best
 
     def shop_step(self, unlocked_idx, income):
@@ -326,11 +329,12 @@ class Player:
                 cost = bal.upgrade_cost(part["rarity"], part["level"])
                 ratio = gain / max(cost, 1)
                 if best is None or ratio > best[0]:
-                    best = (ratio, part, cost)
+                    best = (ratio, part, cost, slot)
             if best is None or best[2] > self.coins:
                 return upgrades
             self.coins -= best[2]
             best[1]["level"] += 1
+            self.slot_upgrades[best[3]] += 1
             upgrades += 1
 
 
@@ -422,6 +426,12 @@ def simulate_player(bal, rng, stats, use_shop=True, shop_log=None):
         if total_races > 5000:
             break  # trava de segurança: campanha travada
     stats[-1].setdefault("_first_leg", []).append(first_legendary_stage)
+    su = stats[-1].setdefault("_slot_upgrades", {k: 0 for k in SLOT_KEYS})
+    for k, v in pl.slot_upgrades.items():
+        su[k] += v
+    fin = stats[-1].setdefault("_final_parts", {k: [] for k in SLOT_KEYS})
+    for k, part in pl.equipped.items():
+        fin[k].append(part)
     return t_total, total_races
 
 
@@ -528,7 +538,17 @@ def main():
           f"p95 {pct(all_d, .95):.1f} s, max {max(all_d):.1f} s")
     print(f"Corridas com algum carro em marcha a re (v < 0 ao fim de um segundo): "
           f"{100.0 * REVERSE['with_reverse'] / max(REVERSE['races'], 1):.2f}%")
-    if bal.shop:
+    su = stats[-1].get("_slot_upgrades", {})
+    fin = stats[-1].get("_final_parts", {})
+    print()
+    print("Por slot (media por jogador): upgrades comprados | bonus da peca equipada no fim | % com peca rara+ no fim")
+    for k in SLOT_KEYS:
+        parts_k = fin.get(k, [])
+        bon = [bal.part_bonus(x["rarity"], x["level"]) if x else 0.0 for x in parts_k]
+        rare_plus = sum(1 for x in parts_k if x and bal.rar_index[x["rarity"]] >= 2)
+        print(f"  {k:13s} upgrades {su.get(k, 0) / n:5.1f} | bonus {statistics.mean(bon):5.1f} | "
+              f"rara+ {100.0 * rare_plus / n:3.0f}% | peso {bal.stat_weight(k):.2f}")
+    if bal.shop and use_shop:
         print()
         print("Loja: corridas de economia = preco / renda media por corrida na fase em que o item libera")
         print("| Item | Raridade nv | Libera na fase | Preco | Corridas de economia | % jogadores que compram | Fase media da compra |")
