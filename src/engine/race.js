@@ -47,7 +47,15 @@ export class Race {
   }
 
   update(dt) {
-    if (this.done || !(dt > 0)) return;
+    if (!(dt > 0)) return;
+    if (this.done) {
+      // Resultado já decidido: os carros só seguem andando na tela durante a pausa.
+      this.time += dt;
+      for (const c of this.cars) c.x += c.v * dt;
+      for (const p of this.popups) p.t += dt;
+      this.popups = this.popups.filter(p => p.t < 1.6);
+      return;
+    }
     const r = this.balance.race;
     this.time += dt;
     const newSecond = Math.floor(this.time) > this.tick;
@@ -84,9 +92,8 @@ export class Race {
     for (const p of this.popups) p.t += dt;
     this.popups = this.popups.filter(p => p.t < 1.6);
 
-    const allIn = this.finishOrder.length === this.cars.length;
-    const timeout = this.firstFinishTime !== null && this.time >= this.firstFinishTime * 2;
-    if (allIn || timeout) {
+    // A corrida acaba quando o jogador cruza a linha: quem ainda não chegou fica atrás dele.
+    if (this.player.finishedAt !== null) {
       const rest = this.cars.filter(c => c.finishedAt === null).sort((a, b) => b.x - a.x);
       for (const c of rest) { this.finishOrder.push(c); c.place = this.finishOrder.length; }
       this.done = true;

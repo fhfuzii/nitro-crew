@@ -155,24 +155,17 @@ def run_race(bal, track, cars, rng):
                 if v2 < 0:
                     reverse = True
         frame += 60
-        done = [f for f in finish if f is not None]
-        if done and cutoff is None:
-            cutoff = 2 * min(done)
-        if cutoff is not None:
-            for i in range(n):
-                if finish[i] is not None and finish[i] > cutoff:
-                    finish[i] = None  # cruzou depois do corte: conta como não chegou
-            if all(f is not None for f in finish) or frame >= cutoff:
-                break
-        if frame > 60 * 600:
+        # A corrida acaba quando o jogador (índice 0) cruza a linha.
+        if finish[0] is not None or frame > 60 * 600:
             break
     REVERSE["races"] += 1
     REVERSE["with_reverse"] += reverse
-    if all(f is not None for f in finish):
-        end_frame = max(finish)
-    else:
-        end_frame = cutoff if cutoff is not None else frame
-    order = sorted(range(n), key=lambda i: (0, finish[i]) if finish[i] is not None else (1, -x[i]))
+    end_frame = finish[0] if finish[0] is not None else frame
+    for i in range(1, n):
+        if finish[i] is not None and finish[i] > end_frame:
+            finish[i] = None  # cruzou depois do jogador: fica atrás dele
+    # Empate no mesmo quadro favorece o jogador (o motor processa o jogador primeiro).
+    order = sorted(range(n), key=lambda i: (0, finish[i], i) if finish[i] is not None else (1, -x[i], i))
     place = [0] * n
     for pos, i in enumerate(order):
         place[i] = pos

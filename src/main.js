@@ -120,6 +120,7 @@ async function boot() {
       }
     }
     if (game.phase === 'results') {
+      game.race.update(realDt * game.speed);
       game.pauseLeft -= realDt * game.speed;
       if (game.pauseLeft <= 0) startRace();
     }

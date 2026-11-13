@@ -122,6 +122,7 @@ Campos obrigatórios:
 - Velocidade a cada segundo: `max(0, potência * speedPerPower * (1 + noise * N(0,1)))`, suavizada; durante o nitro, multiplicada por `boostSpeedMult`.
 - Chance de nitro por segundo: `boost * boostChancePerPointPerSec`.
 - Rivais usam `power` e `boost` diretos.
+- A corrida termina no instante em que o jogador cruza `trackLength`: colocação = carros que já cruzaram + 1 (empate no mesmo quadro favorece o jogador). A pausa até a próxima corrida começa aí.
 - Caixas na pista: o carro do jogador coleta automaticamente ao passar. A raridade da caixa vem do item sorteado.
 - Peça sorteada com `"slot": "any"` escolhe um dos 4 slots com chance igual.
 - Peças repetidas podem ser desmontadas por `scrapCoins` moedas.

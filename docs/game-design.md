@@ -120,7 +120,7 @@ Os pesos são iguais às porcentagens (cada tabela soma 100). O intervalo entre 
 - **Tempo.** O tempo de jogo é a duração simulada de cada corrida mais 5 s de intervalo entre corridas.
 - **Corrida simulada.** Usa passos de 1/60 s com suavização exponencial (constante de 0,5 s) em forma fechada, matematicamente idêntica a repetir `v += (alvo − v)·(1 − e^(−dt/0,5))`.
   - Alvo novo a cada 1 s; o nitro é sorteado a cada 1 s se não estiver ativo.
-  - A corrida termina quando todos cruzam ou em 2× o tempo do primeiro.
+  - A corrida termina quando o **jogador** cruza a linha; quem ainda não chegou fica atrás dele. A pausa de 5 s começa nesse momento. Com essa regra (adotada em 2026-11-13), a vitória média na fase 1 continua em ~61%, a corrida média cai para ~38 s e a campanha para ~0,86 h (p90 1,39 h). A tabela abaixo é da regra anterior; rode o simulador para a versão atual.
 
 ## 7. Resultado do simulador (tabela final)
 
