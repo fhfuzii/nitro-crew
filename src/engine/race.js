@@ -47,7 +47,7 @@ export class Race {
   }
 
   update(dt) {
-    if (this.done) return;
+    if (this.done || !(dt > 0)) return;
     const r = this.balance.race;
     this.time += dt;
     const newSecond = Math.floor(this.time) > this.tick;

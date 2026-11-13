@@ -44,7 +44,9 @@ function parseHex(hex) {
 
 export function frameAt(sprite, timeSec) {
   if (sprite.frames.length === 1) return sprite.frames[0];
-  return sprite.frames[Math.floor(timeSec * sprite.fps) % sprite.frames.length];
+  const n = sprite.frames.length;
+  const i = Math.floor(timeSec * sprite.fps) || 0;
+  return sprite.frames[((i % n) + n) % n];
 }
 
 // Ícone grande para a interface HTML (data URL ampliada sem suavização).

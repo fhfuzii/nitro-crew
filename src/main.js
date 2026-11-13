@@ -98,8 +98,19 @@ async function boot() {
 
   let last = performance.now();
   function frame(now) {
-    const realDt = Math.min(0.1, (now - last) / 1000);
-    last = now;
+    // Agenda o próximo quadro antes de tudo: um erro aqui não pode parar o jogo.
+    requestAnimationFrame(frame);
+    // O timestamp do rAF pode ser anterior ao performance.now() da largada; nunca usar dt negativo.
+    const realDt = Math.max(0, Math.min(0.1, (now - last) / 1000));
+    last = Math.max(last, now);
+    try {
+      step(realDt);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function step(realDt) {
     state.totals.playSec += realDt;
     const steps = game.speed;
     for (let i = 0; i < steps; i++) {
@@ -114,7 +125,6 @@ async function boot() {
     }
     game.race.draw(g, S, THEME, labels);
     if (game.phase === 'results') drawResults(g, game);
-    requestAnimationFrame(frame);
   }
 
   startRace();
