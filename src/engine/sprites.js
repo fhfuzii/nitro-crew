@@ -12,7 +12,7 @@ export function buildSprites(PALETTE, SPRITES) {
   return out;
 }
 
-function rasterize(PALETTE, w, h, rows) {
+export function rasterize(PALETTE, w, h, rows) {
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;

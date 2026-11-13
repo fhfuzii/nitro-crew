@@ -910,5 +910,166 @@
         }
       }
     ]
+  },
+  "cosmetics": {
+    "paint": {
+      "stock": {
+        "price": 0
+      },
+      "red": {
+        "price": 250
+      },
+      "blue": {
+        "price": 250
+      },
+      "green": {
+        "price": 250
+      },
+      "purple": {
+        "price": 700,
+        "unlock": {
+          "stage": "s4"
+        }
+      },
+      "white": {
+        "price": 700,
+        "unlock": {
+          "stage": "s4"
+        }
+      },
+      "matte_black": {
+        "price": 2200,
+        "unlock": {
+          "stage": "s8"
+        }
+      },
+      "gold": {
+        "price": 2800,
+        "unlock": {
+          "stage": "s8"
+        }
+      }
+    },
+    "glass": {
+      "stock": {
+        "price": 0
+      },
+      "smoke": {
+        "price": 200
+      },
+      "mirror": {
+        "price": 800,
+        "unlock": {
+          "stage": "s4"
+        }
+      },
+      "emerald": {
+        "price": 1100,
+        "unlock": {
+          "stage": "s6"
+        }
+      }
+    },
+    "headlight": {
+      "stock": {
+        "price": 0
+      },
+      "xenon": {
+        "price": 200
+      },
+      "ice_blue": {
+        "price": 700,
+        "unlock": {
+          "stage": "s4"
+        }
+      },
+      "violet": {
+        "price": 1100,
+        "unlock": {
+          "stage": "s6"
+        }
+      }
+    },
+    "rims": {
+      "stock": {
+        "price": 0
+      },
+      "black": {
+        "price": 300
+      },
+      "chrome": {
+        "price": 900,
+        "unlock": {
+          "stage": "s4"
+        }
+      },
+      "bronze": {
+        "price": 800,
+        "unlock": {
+          "stage": "s4"
+        }
+      },
+      "gold": {
+        "price": 2400,
+        "unlock": {
+          "stage": "s8"
+        }
+      }
+    },
+    "neon": {
+      "none": {
+        "price": 0
+      },
+      "pink": {
+        "price": 1500,
+        "unlock": {
+          "stage": "s6"
+        }
+      },
+      "cyan": {
+        "price": 1500,
+        "unlock": {
+          "stage": "s6"
+        }
+      },
+      "green": {
+        "price": 1500,
+        "unlock": {
+          "stage": "s6"
+        }
+      },
+      "purple": {
+        "price": 1500,
+        "unlock": {
+          "stage": "s6"
+        }
+      },
+      "orange": {
+        "price": 1500,
+        "unlock": {
+          "stage": "s6"
+        }
+      }
+    },
+    "spoiler": {
+      "wing": {
+        "price": 0
+      },
+      "none": {
+        "price": 0
+      },
+      "ducktail": {
+        "price": 800,
+        "unlock": {
+          "stage": "s4"
+        }
+      },
+      "gt": {
+        "price": 2600,
+        "unlock": {
+          "stage": "s8"
+        }
+      }
+    }
   }
 }

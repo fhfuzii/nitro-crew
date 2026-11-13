@@ -27,6 +27,18 @@ export const PALETTE = {
   v: '#45246e', // sombra do roxo
   m: '#ff4fa3', // néon rosa (letreiros)
   c: '#3fe0d0', // néon ciano / chama do nitro
+  // --- canais reservados do carro do jogador (cor = opção stock de CUSTOM) ---
+  '1': '#a23e48', // paint: sombra
+  '2': '#f0663a', // paint: base
+  '3': '#ffa94d', // paint: luz
+  '4': '#ffd23f', // paint: faixa
+  '5': '#fff4b0', // paint: luz da faixa
+  '6': '#29366f', // glass: base
+  '7': '#94b0c2', // glass: reflexo
+  '8': '#ffd23f', // headlight: base
+  '9': '#fff4b0', // headlight: núcleo
+  e: '#566c86', // rims: base
+  E: '#f4f4f4', // rims: brilho
 };
 
 // Cores da interface HTML. Raridades = mesmas cores das caixas.
@@ -53,73 +65,109 @@ export const THEME = {
 };
 
 export const SPRITES = {
-  // Jogador: cupê anos 90 'laranja nitro', asa traseira, faixa amarela. Rodas: 4 frames, raios girando no sentido horário.
+  // Jogador (canais 1-9/e/E, ver CUSTOM): cupê anos 90 'laranja nitro', asa traseira, faixa amarela. Rodas: 4 frames, raios girando no sentido horário.
   car_player: {
     w: 32, h: 14, fps: 12,
+    mounts: { spoiler: [2, 2], underglow: [11, 20, 11] },
     frames: [
       [
-        '.kkkkkk.....kkkkkkkk............',
-        '.kOOOOk...kkOOOOOOOOkk..........',
-        '.kkkkkk.kkdGGddkdGGdddkk........',
-        '..g..g.kdGdddddkdGdddddddkk.....',
-        'kOOOOOOOOOOOOOOOOOOOOOOOOOOkkk..',
-        'kRRoooooooooooorooooooooooooyyk.',
-        'kRryyyyyyyyyyyyryyyyyyyyyyyoYYyk',
-        'kroookkkkkooooooooooookkkkkooook',
-        'krrrkkgKKkkrrrrrrrrrrkkgKKkkrrrk',
-        'kKrrkKwggKkrrrrrrrrrrkKwggKkrrrk',
-        '.kkkkKgkgKkkkkkkkkkkkkKgkgKkkkk.',
-        '....kKggwKk..........kKggwKk....',
+        '............kkkkkkkk............',
+        '..........kk33333333kk..........',
+        '........kk67766k677666kk........',
+        '.kkkkkkk6766666k676666666kk.....',
+        'k33333333333333333333333333kkk..',
+        'kRR222222222222122222222222288k.',
+        'kR15444444444441544444444442998k',
+        'k1222kkkkk222222222222kkkkk2222k',
+        'k111kkgKKkk1111111111kkgKKkk111k',
+        'kK11kKEeeKk1111111111kKEeeKk111k',
+        '.kkkkKekeKkkkkkkkkkkkkKekeKkkkk.',
+        '....kKeeEKk..........kKeeEKk....',
         '.....kKKKk............kKKKk.....',
         '......kkk..............kkk......',
       ],
       [
-        '.kkkkkk.....kkkkkkkk............',
-        '.kOOOOk...kkOOOOOOOOkk..........',
-        '.kkkkkk.kkdGGddkdGGdddkk........',
-        '..g..g.kdGdddddkdGdddddddkk.....',
-        'kOOOOOOOOOOOOOOOOOOOOOOOOOOkkk..',
-        'kRRoooooooooooorooooooooooooyyk.',
-        'kRryyyyyyyyyyyyryyyyyyyyyyyoYYyk',
-        'kroookkkkkooooooooooookkkkkooook',
-        'krrrkkgKKkkrrrrrrrrrrkkgKKkkrrrk',
-        'kKrrkKgwgKkrrrrrrrrrrkKgwgKkrrrk',
-        '.kkkkKgkgKkkkkkkkkkkkkKgkgKkkkk.',
-        '....kKgwgKk..........kKgwgKk....',
+        '............kkkkkkkk............',
+        '..........kk33333333kk..........',
+        '........kk67766k677666kk........',
+        '.kkkkkkk6766666k676666666kk.....',
+        'k33333333333333333333333333kkk..',
+        'kRR222222222222122222222222288k.',
+        'kR15444444444441544444444442998k',
+        'k1222kkkkk222222222222kkkkk2222k',
+        'k111kkgKKkk1111111111kkgKKkk111k',
+        'kK11kKeEeKk1111111111kKeEeKk111k',
+        '.kkkkKekeKkkkkkkkkkkkkKekeKkkkk.',
+        '....kKeEeKk..........kKeEeKk....',
         '.....kKKKk............kKKKk.....',
         '......kkk..............kkk......',
       ],
       [
-        '.kkkkkk.....kkkkkkkk............',
-        '.kOOOOk...kkOOOOOOOOkk..........',
-        '.kkkkkk.kkdGGddkdGGdddkk........',
-        '..g..g.kdGdddddkdGdddddddkk.....',
-        'kOOOOOOOOOOOOOOOOOOOOOOOOOOkkk..',
-        'kRRoooooooooooorooooooooooooyyk.',
-        'kRryyyyyyyyyyyyryyyyyyyyyyyoYYyk',
-        'kroookkkkkooooooooooookkkkkooook',
-        'krrrkkgKKkkrrrrrrrrrrkkgKKkkrrrk',
-        'kKrrkKggwKkrrrrrrrrrrkKggwKkrrrk',
-        '.kkkkKgkgKkkkkkkkkkkkkKgkgKkkkk.',
-        '....kKwggKk..........kKwggKk....',
+        '............kkkkkkkk............',
+        '..........kk33333333kk..........',
+        '........kk67766k677666kk........',
+        '.kkkkkkk6766666k676666666kk.....',
+        'k33333333333333333333333333kkk..',
+        'kRR222222222222122222222222288k.',
+        'kR15444444444441544444444442998k',
+        'k1222kkkkk222222222222kkkkk2222k',
+        'k111kkgKKkk1111111111kkgKKkk111k',
+        'kK11kKeeEKk1111111111kKeeEKk111k',
+        '.kkkkKekeKkkkkkkkkkkkkKekeKkkkk.',
+        '....kKEeeKk..........kKEeeKk....',
         '.....kKKKk............kKKKk.....',
         '......kkk..............kkk......',
       ],
       [
-        '.kkkkkk.....kkkkkkkk............',
-        '.kOOOOk...kkOOOOOOOOkk..........',
-        '.kkkkkk.kkdGGddkdGGdddkk........',
-        '..g..g.kdGdddddkdGdddddddkk.....',
-        'kOOOOOOOOOOOOOOOOOOOOOOOOOOkkk..',
-        'kRRoooooooooooorooooooooooooyyk.',
-        'kRryyyyyyyyyyyyryyyyyyyyyyyoYYyk',
-        'kroookkkkkooooooooooookkkkkooook',
-        'krrrkkgKKkkrrrrrrrrrrkkgKKkkrrrk',
-        'kKrrkKgggKkrrrrrrrrrrkKgggKkrrrk',
-        '.kkkkKwkwKkkkkkkkkkkkkKwkwKkkkk.',
-        '....kKgggKk..........kKgggKk....',
+        '............kkkkkkkk............',
+        '..........kk33333333kk..........',
+        '........kk67766k677666kk........',
+        '.kkkkkkk6766666k676666666kk.....',
+        'k33333333333333333333333333kkk..',
+        'kRR222222222222122222222222288k.',
+        'kR15444444444441544444444442998k',
+        'k1222kkkkk222222222222kkkkk2222k',
+        'k111kkgKKkk1111111111kkgKKkk111k',
+        'kK11kKeeeKk1111111111kKeeeKk111k',
+        '.kkkkKEkEKkkkkkkkkkkkkKEkEKkkkk.',
+        '....kKeeeKk..........kKeeeKk....',
         '.....kKKKk............kKKKk.....',
         '......kkk..............kkk......',
+      ],
+    ],
+  },
+  spoiler_wing: {
+    w: 7, h: 4, fps: 1,
+    anchor: [2, 3],
+    frames: [
+      [
+        '.kkkkkk',
+        '.k3333k',
+        '.kkkkkk',
+        '..g..g.',
+      ],
+    ],
+  },
+  spoiler_ducktail: {
+    w: 6, h: 2, fps: 1,
+    anchor: [2, 1],
+    frames: [
+      [
+        'kk....',
+        'k33kkk',
+      ],
+    ],
+  },
+  spoiler_gt: {
+    w: 10, h: 5, fps: 1,
+    anchor: [2, 4],
+    frames: [
+      [
+        'kkkkkkkkk.',
+        'k3333333k.',
+        'kk11111kk.',
+        '..g...g...',
+        '..g...g...',
       ],
     ],
   },
@@ -958,6 +1006,56 @@ export const SPRITES = {
         'wwwwkkkk',
         'wwwwkkkk',
       ],
+    ],
+  },
+};
+
+// Personalização visual do carro do jogador (contracts.md 2.1). Só visual.
+// O 1º item de cada lista é o padrão. ids fixos; nomes e cores são da arte.
+export const CUSTOM = {
+  options: {
+    paint: [
+      { id: 'stock', name: 'Laranja Nitro', colors: { '1': '#a23e48', '2': '#f0663a', '3': '#ffa94d', '4': '#ffd23f', '5': '#fff4b0' } },
+      { id: 'red', name: 'Vermelho Brasa', colors: { '1': '#7a1f2b', '2': '#e8323c', '3': '#ff7a6b', '4': '#f4f4f4', '5': '#ffffff' } },
+      { id: 'blue', name: 'Azul Elétrico', colors: { '1': '#29366f', '2': '#2f5fd0', '3': '#5cb8ff', '4': '#3fe0d0', '5': '#c8fff8' } },
+      { id: 'green', name: 'Verde Canarinho', colors: { '1': '#1d5e4e', '2': '#2e9e57', '3': '#7be05a', '4': '#ffd23f', '5': '#fff4b0' } },
+      { id: 'purple', name: 'Roxo Madrugada', colors: { '1': '#45246e', '2': '#7d3fc4', '3': '#c27dff', '4': '#ff4fa3', '5': '#ffc2e0' } },
+      { id: 'white', name: 'Branco Pérola', colors: { '1': '#94b0c2', '2': '#d6e0ea', '3': '#ffffff', '4': '#e8323c', '5': '#ff7a6b' } },
+      { id: 'matte_black', name: 'Preto Fosco', colors: { '1': '#24252f', '2': '#363847', '3': '#50536a', '4': '#e8323c', '5': '#ff7a6b' } },
+      { id: 'gold', name: 'Dourado', colors: { '1': '#9a5c12', '2': '#d9a02a', '3': '#ffe08a', '4': '#1a1c2c', '5': '#3d4258' } },
+    ],
+    glass: [
+      { id: 'stock', name: 'Vidro Noturno', colors: { '6': '#29366f', '7': '#94b0c2' } },
+      { id: 'smoke', name: 'Fumê', colors: { '6': '#202130', '7': '#6a7f99' } },
+      { id: 'mirror', name: 'Espelhado', colors: { '6': '#7f9cbc', '7': '#f4f4f4' } },
+      { id: 'emerald', name: 'Esmeralda', colors: { '6': '#1d5e4e', '7': '#7be05a' } },
+    ],
+    headlight: [
+      { id: 'stock', name: 'Halógeno', colors: { '8': '#ffd23f', '9': '#fff4b0' } },
+      { id: 'xenon', name: 'Xenônio', colors: { '8': '#dfe9ff', '9': '#ffffff' } },
+      { id: 'ice_blue', name: 'Azul Gelo', colors: { '8': '#5cb8ff', '9': '#d4f1ff' } },
+      { id: 'violet', name: 'Violeta', colors: { '8': '#c27dff', '9': '#f0dcff' } },
+    ],
+    rims: [
+      { id: 'stock', name: 'Aço', colors: { 'e': '#566c86', 'E': '#f4f4f4' } },
+      { id: 'chrome', name: 'Cromado', colors: { 'e': '#b8c8d8', 'E': '#ffffff' } },
+      { id: 'black', name: 'Preto', colors: { 'e': '#24252f', 'E': '#6a7f99' } },
+      { id: 'gold', name: 'Dourado', colors: { 'e': '#c27c1e', 'E': '#ffd23f' } },
+      { id: 'bronze', name: 'Bronze', colors: { 'e': '#8a5a3a', 'E': '#d39b6a' } },
+    ],
+    neon: [
+      { id: 'none', name: 'Sem néon' },
+      { id: 'pink', name: 'Rosa Néon', colors: { base: '#ff4fa3', light: '#ffc2e0' } },
+      { id: 'cyan', name: 'Ciano', colors: { base: '#3fe0d0', light: '#c8fff8' } },
+      { id: 'green', name: 'Verde Ácido', colors: { base: '#7be05a', light: '#e0ffc8' } },
+      { id: 'purple', name: 'Roxo', colors: { base: '#c27dff', light: '#f0dcff' } },
+      { id: 'orange', name: 'Laranja', colors: { base: '#f0663a', light: '#ffcf8a' } },
+    ],
+    spoiler: [
+      { id: 'wing', name: 'Asa Clássica', sprite: 'spoiler_wing' },
+      { id: 'none', name: 'Sem aerofólio' },
+      { id: 'ducktail', name: 'Rabo-de-pato', sprite: 'spoiler_ducktail' },
+      { id: 'gt', name: 'Asa GT', sprite: 'spoiler_gt' },
     ],
   },
 };

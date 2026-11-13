@@ -130,7 +130,7 @@ export class Race {
       const sp = S[c.sprite] ?? S.car_rival_a;
       if (c.boostLeft > 0 && S.fx_boost) g.drawImage(frameAt(S.fx_boost, this.time), sx - 8, y + 6);
       const moving = c.v > 1 ? this.time * Math.min(3, c.v / 30) : 0;
-      g.drawImage(frameAt(sp, moving), sx, y);
+      g.drawImage(frameAt(sp, moving), sx - (sp.ox ?? 0), y - (sp.oy ?? 0)); // ox/oy: carro personalizado (aerofólio/néon)
     }
 
     g.font = `8px "${theme.font}", monospace`;

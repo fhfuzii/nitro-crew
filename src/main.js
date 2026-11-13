@@ -1,11 +1,12 @@
 // Ponto de entrada: carrega dados e arte, roda o loop de corridas.
-import { PALETTE, THEME, SPRITES } from './art/sprites.js';
+import { PALETTE, THEME, SPRITES, CUSTOM } from './art/sprites.js';
 import { buildSprites } from './engine/sprites.js';
 import { Race, VIEW_W, VIEW_H, outlinedText } from './engine/race.js';
 import { statTotals, powerOf, rollLoot, rarityOf } from './engine/economy.js';
 import { load, save, addLog, receivePart, highestUnlocked } from './engine/state.js';
 import { randRange } from './engine/rng.js';
 import { initUI } from './ui/ui.js';
+import { buildPlayerCar } from './engine/custom.js';
 
 const RESULT_PAUSE_SEC = 5;
 
@@ -23,6 +24,12 @@ async function boot() {
   g.imageSmoothingEnabled = false;
 
   const game = { balance, state, S, theme: THEME, race: null, phase: 'racing', pauseLeft: 0, lastResult: null, speed: 1 };
+
+  // Carro do jogador com a personalização escolhida (a UI chama de novo quando muda algo).
+  game.CUSTOM = CUSTOM;
+  game.buildCar = chosen => buildPlayerCar(PALETTE, SPRITES, CUSTOM, chosen);
+  game.applyCustom = () => { if (CUSTOM) S.car_player = game.buildCar(state.custom.chosen); };
+  game.applyCustom();
 
   const labels = {
     loot(l) {

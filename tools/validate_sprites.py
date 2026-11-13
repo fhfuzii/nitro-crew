@@ -45,6 +45,22 @@ RARITIES = ["common", "uncommon", "rare", "epic", "legendary"]
 HEX = re.compile(r"^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$")
 TRANSPARENT = {".", " "}
 
+# Seção 2.1 do contrato: canais reservados do carro do jogador e catálogo.
+RESERVED = {
+    "1": "paint sombra", "2": "paint base", "3": "paint luz", "4": "paint faixa", "5": "paint luz da faixa",
+    "6": "glass base", "7": "glass reflexo", "8": "headlight base", "9": "headlight núcleo",
+    "e": "rims base", "E": "rims brilho",
+}
+CHANNEL_KEYS = {"paint": "12345", "glass": "67", "headlight": "89", "rims": "eE"}
+CUSTOM_IDS = {
+    "paint": ["stock", "red", "blue", "green", "purple", "white", "matte_black", "gold"],
+    "glass": ["stock", "smoke", "mirror", "emerald"],
+    "headlight": ["stock", "xenon", "ice_blue", "violet"],
+    "rims": ["stock", "chrome", "black", "gold", "bronze"],
+    "neon": ["none", "pink", "cyan", "green", "purple", "orange"],
+    "spoiler": ["wing", "none", "ducktail", "gt"],
+}
+
 
 def _block(src, name):
     m = re.search(r"export\s+const\s+" + name + r"\s*=\s*(\{.*?\n\});", src, re.S)
@@ -66,6 +82,81 @@ def load(path=SPRITES_JS):
     return js_to_json(_block(src, "PALETTE")), js_to_json(_block(src, "THEME")), js_to_json(_block(src, "SPRITES"))
 
 
+def load_custom(path=SPRITES_JS):
+    return js_to_json(_block(Path(path).read_text(encoding="utf-8"), "CUSTOM"))
+
+
+def is_player_car(key):
+    return key == "car_player" or key.startswith("car_player_")
+
+
+def validate_custom(custom, sprites):
+    """Seção 2.1: canais, mounts, aerofólios e catálogo CUSTOM.options."""
+    errs = []
+    opts = (custom or {}).get("options")
+    if not isinstance(opts, dict):
+        return ["CUSTOM.options ausente"]
+    for cat, ids in CUSTOM_IDS.items():
+        lst = opts.get(cat)
+        if not isinstance(lst, list):
+            errs.append(f"CUSTOM.options.{cat} ausente")
+            continue
+        got = [o.get("id") for o in lst]
+        if got != ids:
+            errs.append(f"CUSTOM.options.{cat}: ids {got}, esperado {ids} (nesta ordem)")
+        for o in lst:
+            oid = o.get("id")
+            if not o.get("name"):
+                errs.append(f"CUSTOM.{cat}.{oid}: sem name")
+            if cat in CHANNEL_KEYS:
+                cols = o.get("colors", {})
+                if sorted(cols) != sorted(CHANNEL_KEYS[cat]):
+                    errs.append(f"CUSTOM.{cat}.{oid}: colors {sorted(cols)}, esperado {sorted(CHANNEL_KEYS[cat])}")
+                for k, v in cols.items():
+                    if not HEX.match(str(v)):
+                        errs.append(f"CUSTOM.{cat}.{oid}.{k}: hex inválido {v!r}")
+            elif cat == "neon" and oid != "none":
+                cols = o.get("colors", {})
+                for k in ("base", "light"):
+                    if not HEX.match(str(cols.get(k, ""))):
+                        errs.append(f"CUSTOM.neon.{oid}.{k} ausente ou inválido")
+            elif cat == "spoiler" and oid != "none":
+                spr = o.get("sprite")
+                if spr not in sprites:
+                    errs.append(f"CUSTOM.spoiler.{oid}: sprite {spr!r} não existe")
+    # aerofólios
+    for key, s in sprites.items():
+        if not key.startswith("spoiler_"):
+            continue
+        a = s.get("anchor")
+        if not (isinstance(a, list) and len(a) == 2 and all(isinstance(v, int) for v in a)
+                and 0 <= a[0] < s["w"] and 0 <= a[1] < s["h"]):
+            errs.append(f"{key}: anchor [ax, ay] ausente ou fora do sprite")
+        used = {c for fr in s["frames"] for row in fr for c in row}
+        bad = used & (set(RESERVED) - set("12345"))
+        if bad:
+            errs.append(f"{key}: aerofólio só pode usar o canal paint (1-5), usa {sorted(bad)}")
+    # carros do jogador: mounts; demais sprites: sem letras reservadas
+    for key, s in sprites.items():
+        used = {c for fr in s["frames"] for row in fr for c in row}
+        if is_player_car(key):
+            m = s.get("mounts") or {}
+            sp, ug = m.get("spoiler"), m.get("underglow")
+            if not (isinstance(sp, list) and len(sp) == 2 and 0 <= sp[0] < s["w"] and 0 <= sp[1] < s["h"]):
+                errs.append(f"{key}: mounts.spoiler [x, y] ausente ou fora do sprite")
+            if not (isinstance(ug, list) and len(ug) == 3 and 0 <= ug[0] <= ug[1] < s["w"] and 0 <= ug[2] < s["h"]):
+                errs.append(f"{key}: mounts.underglow [x0, x1, y] ausente ou inválido")
+            elif any(fr[ug[2]][x] not in TRANSPARENT for fr in s["frames"] for x in range(ug[0], ug[1] + 1)):
+                errs.append(f"{key}: a linha do néon (underglow) tem que estar vazia no carro")
+            if not used & set("12345"):
+                errs.append(f"{key}: carro do jogador sem canal paint")
+        elif not key.startswith("spoiler_"):
+            bad = used & set(RESERVED)
+            if bad:
+                errs.append(f"{key}: usa letras reservadas do carro do jogador {sorted(bad)}")
+    return errs
+
+
 def validate(palette, theme, sprites):
     errs, warns = [], []
     # paleta
@@ -74,8 +165,12 @@ def validate(palette, theme, sprites):
             errs.append(f"PALETTE: chave inválida {k!r}")
         if not HEX.match(v):
             errs.append(f"PALETTE.{k}: hex inválido {v!r}")
-    if not 16 <= len(palette) <= 24:
-        warns.append(f"PALETTE tem {len(palette)} cores (guia pede 16-24)")
+    base_colors = [k for k in palette if k not in RESERVED]
+    if not 16 <= len(base_colors) <= 24:
+        warns.append(f"PALETTE tem {len(base_colors)} cores-base fora dos canais (guia pede 16-24)")
+    for ch in RESERVED:
+        if ch not in palette:
+            errs.append(f"PALETTE: letra reservada {ch!r} ({RESERVED[ch]}) ausente")
     # tema
     for k in THEME_KEYS:
         if k not in theme:
@@ -122,17 +217,20 @@ def validate(palette, theme, sprites):
 def main():
     try:
         palette, theme, sprites = load()
+        custom = load_custom()
     except Exception as e:  # noqa: BLE001
         print(f"ERRO ao ler {SPRITES_JS}: {e}")
         return 1
     errs, warns = validate(palette, theme, sprites)
+    errs += validate_custom(custom, sprites)
     for w in warns:
         print("aviso:", w)
     for e in errs:
         print("ERRO:", e)
     extras = sorted(set(sprites) - set(REQUIRED))
     print(f"{len(sprites)} sprites ({len(REQUIRED)} obrigatórios, extras: {', '.join(extras) or 'nenhum'}), "
-          f"{len(palette)} cores na paleta.")
+          f"{len(palette) - len(RESERVED)} cores-base + {len(RESERVED)} canais reservados na paleta; "
+          f"CUSTOM com {sum(len(v) for v in custom['options'].values())} opções.")
     print("OK" if not errs else f"FALHOU: {len(errs)} erro(s)")
     return 1 if errs else 0
 

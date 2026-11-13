@@ -41,6 +41,11 @@ Jogador guloso:
       economiza: não gasta em upgrade nesta rodada;
     * mais longe que isso -> ignora a loja e faz upgrades normalmente.
   Com --no-shop a loja é ignorada.
+- Personalização (balance.cosmetics, contrato 3.2): por padrão o guloso não
+  compra nada. Com --cosmetics-pct X, cada jogador sorteia X% das opções
+  pagas como "lista de desejos" e compra cada uma assim que estiver liberada
+  e houver moedas, ANTES da loja e dos upgrades (estimativa do quanto a
+  campanha alonga para quem gasta em visual).
 - Sempre corre a fase mais alta liberada.
 - Tempo de jogo = soma da duração simulada das corridas + 5 s entre corridas.
 """
@@ -79,6 +84,11 @@ class Balance:
         self.tables = data["lootTables"]
         self.pl = data["partLevel"]
         self.final_wins = data.get("campaign", {}).get("finalStageWins", 1)
+        self.cosmetics = [
+            (cat, oid, o["price"], o.get("unlock", {}).get("stage"))
+            for cat, opts in data.get("cosmetics", {}).items()
+            for oid, o in opts.items() if o.get("price", 0) > 0
+        ]
         self.stage_index = {st["id"]: i for i, st in enumerate(self.stages)}
         self.shop = data.get("shop", {}).get("items", [])
 
@@ -338,10 +348,14 @@ class Player:
             upgrades += 1
 
 
-def simulate_player(bal, rng, stats, use_shop=True, shop_log=None):
+def simulate_player(bal, rng, stats, use_shop=True, shop_log=None, cosmetics_pct=0.0, cosm_log=None):
     """Simula um jogador até concluir a campanha. Acumula em stats[stage_idx]."""
     pl = Player(bal)
     incomes = []
+    wish = []
+    if cosmetics_pct > 0 and bal.cosmetics:
+        k = round(len(bal.cosmetics) * cosmetics_pct / 100.0)
+        wish = rng.sample(bal.cosmetics, k)
     nst = len(bal.stages)
     unlocked = 0
     wins = [0] * nst
@@ -391,6 +405,14 @@ def simulate_player(bal, rng, stats, use_shop=True, shop_log=None):
         pl.receive_parts(got_parts)
         incomes.append(pl.coins - coins_before)
         s["income"].append(incomes[-1])
+        for c in list(wish):
+            cst = bal.stage_index[c[3]] if c[3] else 0
+            if cst <= unlocked and pl.coins >= c[2]:
+                pl.coins -= c[2]
+                wish.remove(c)
+                if cosm_log is not None:
+                    cosm_log["spent"] += c[2]
+                    cosm_log["bought"] += 1
         if use_shop and bal.shop:
             recent = incomes[-INCOME_WINDOW:]
             for iid in pl.shop_step(unlocked, sum(recent) / len(recent)):
@@ -477,6 +499,8 @@ def main():
     ap.add_argument("--players", type=int, default=200)
     ap.add_argument("--seed", type=int, default=12345)
     ap.add_argument("--no-shop", action="store_true", help="ignora balance.shop")
+    ap.add_argument("--cosmetics-pct", type=float, default=0.0,
+                    help="%% do catálogo de personalização paga que cada jogador compra (padrão 0)")
     args = ap.parse_args()
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -492,9 +516,10 @@ def main():
     totals = []
     race_counts = []
     shop_log = {}
+    cosm_log = {"spent": 0, "bought": 0}
     use_shop = not args.no_shop
     for _ in range(args.players):
-        t, n = simulate_player(bal, rng, stats, use_shop, shop_log)
+        t, n = simulate_player(bal, rng, stats, use_shop, shop_log, args.cosmetics_pct, cosm_log)
         totals.append(t)
         race_counts.append(n)
 
@@ -533,6 +558,9 @@ def main():
           f"(p10 {pct(totals, .1) / 3600:.2f} h, p90 {pct(totals, .9) / 3600:.2f} h); "
           f"corridas: media {statistics.mean(race_counts):.0f}")
     print(f"Jogadores sem nenhuma lendaria ao fim: {no_leg:.0f}%")
+    if args.cosmetics_pct > 0:
+        print(f"Personalizacao: lista de desejos = {args.cosmetics_pct:.0f}% do catalogo pago; "
+              f"comprou em media {cosm_log['bought'] / n:.1f} opcoes, gastou {cosm_log['spent'] / n:.0f} moedas")
     all_d = [d for s in stats for d in s["durations"]]
     print(f"Duracao das corridas: min {min(all_d):.1f} s, p5 {pct(all_d, .05):.1f} s, "
           f"p95 {pct(all_d, .95):.1f} s, max {max(all_d):.1f} s")

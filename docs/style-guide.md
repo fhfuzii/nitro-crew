@@ -33,6 +33,8 @@ Corrida de rua noturna numa cidade brasileira fictícia: asfalto escuro, postes 
 
 `.` e espaço são transparentes. Não crie cor nova sem antes tentar as 24; se precisar, adicione no fim e documente aqui (limite: 24).
 
+Além das 24, o `PALETTE` tem **11 letras reservadas** (`1`–`9`, `e`, `E`) que são canais de cor do carro do jogador (seção 7). Elas não contam no limite e não podem ser usadas em nenhum outro sprite.
+
 **Cada família de cor tem 3 tons:** luz / base / sombra. Laranja `O o r`, azul `B b d`, verde `N n q`, roxo `P p v`, ouro `Y y h`, metal `G g K`.
 
 ## 2. Contorno, luz e sombra
@@ -51,7 +53,7 @@ Corrida de rua noturna numa cidade brasileira fictícia: asfalto escuro, postes 
 - Carroceria nas linhas 4–10; cabine nas linhas 0–4. Espaço vazio em cima é permitido (muscle car é baixo).
 - Rodas têm **4 frames**: dois raios `w` girando no sentido horário sobre aro `g`, cubo `k`. Animação a ~12 fps.
 - Cada carro precisa de **silhueta própria**, não só cor:
-  - Jogador — cupê fastback laranja, asa traseira em postes, faixa amarela, farol duplo.
+  - Jogador — cupê fastback laranja, faixa amarela, farol duplo; a asa traseira é um sprite separado (`spoiler_wing`, padrão). Cores por canais (seção 7).
   - Rival A — muscle car azul: teto baixo, capô longo com tomada de ar, frente reta, faixa branca.
   - Rival B — hatch verde: teto alto e comprido, 3 janelas, traseira reta, carro mais curto.
   - Rival C — picape roxa: cabine alta, caçamba baixa, friso néon rosa.
@@ -97,3 +99,61 @@ Na UI: cartão comum tem borda 1 px; incomum+ borda 2 px; épica e lendária pod
 7. Tiles (pista, skyline) repetem sem emenda: confira a coluna 0 contra a última.
 8. Nada copiado: sem marcas, logos, carros licenciados ou personagens existentes.
 9. Rode `python tools/validate_sprites.py` (tem que dar `OK`) e `python tools/preview_sprites.py`, e olhe `docs/sprite-sheet.png`.
+10. Se for carro do jogador: siga também a seção 7 e confira a fileira de combinações no sprite sheet.
+
+## 7. Personalização e modelos futuros
+
+A personalização (contrato, seção 2.1) é só troca de cor por canal + peças encaixadas. Todo carro do jogador, o `car_player` de hoje e qualquer `car_player_<modelo>` futuro, aceita **as mesmas opções** do `CUSTOM.options`, sem nenhum dado por modelo além dos `mounts`. Por isso, o desenho do carro tem que seguir as regras abaixo.
+
+### 7.1 Canais (letras reservadas)
+
+| Canal | Letras | Como usar no desenho |
+|---|---|---|
+| paint | `3` luz, `2` base, `1` sombra | carroceria: linha de cima = `3`, laterais = `2`, metade de baixo e saias = `1`. Separações de porta/painel em `1`. Teto em `3`. |
+| paint | `4` faixa, `5` luz da faixa | faixa decorativa de 1 px na lateral; `5` só no 1º pixel de cada trecho (luz vinda da esquerda). |
+| glass | `6` base, `7` reflexo | todas as janelas; reflexo diagonal de 2–3 px em `7` em cada janela. Colunas (pilares) em `k`. |
+| headlight | `8` base, `9` núcleo | farol na frente (2–4 px); `9` no centro. A lanterna traseira continua `R`. |
+| rims | `e` aro, `E` raio | a roda padrão (7×7, 4 frames) com aro `e` e raios girando em `E`; pneu `K`, cubo `k`. |
+
+Fixos (não personalizáveis): contorno `k`, pneu `K`, caixa de roda `k`, lanterna `R`, escapamento `K`, brilho do pneu `g`.
+
+Cada pintura do catálogo tem 3 tons separados por contraste claro e uma faixa que contrasta com a base (dourado com faixa preta, preto fosco com faixa vermelha, branco com faixa vermelha, azul com faixa ciano para não virar o rival A, verde com faixa amarela). Vidro fumê e espelhado mantêm o reflexo `7` bem mais claro que `6`, para continuar lendo como vidro. Os néons usam as cores mais saturadas da paleta, para contrastar com o asfalto `a`.
+
+### 7.2 Desenhando um modelo novo (`car_player_<modelo>`)
+
+1. Mesmo quadro de 32×14, virado para a direita, rodas 7×7 tocando a linha 13, 4 frames de roda. A posição das rodas pode mudar (entre-eixos maior ou menor), mas a roda é a mesma.
+2. Desenhe primeiro em cores normais, depois troque **toda** cor personalizável pela letra do canal. Nada personalizável pode ficar com cor fixa (ex.: um friso laranja fixo ficaria errado com pintura azul).
+3. Partes que o modelo não tem: simplesmente não use as letras (sem faixa = sem `4`/`5`; jipe sem vidro traseiro = só a janela da frente). Nunca reaproveite uma letra de canal para outra coisa (ex.: `4` como grade do radiador).
+4. Não desenhe aerofólio no corpo. A tampa traseira tem que parecer **fechada e completa** sem aerofólio: contorno `k` em cima da tampa e luz `3` logo abaixo.
+5. Confira o carro com todas as pinturas, inclusive `white` (a sombra `1` vira cinza-azulado) e `matte_black` (o contorno precisa continuar separando o carro do asfalto).
+
+### 7.3 Mounts
+
+```js
+mounts: { spoiler: [x, y], underglow: [x0, x1, y] }
+```
+
+- **`spoiler`**: o pixel **vazio logo acima do contorno da tampa traseira**, a 2–3 px da ponta traseira. No `car_player`: `[2, 2]` (tampa com contorno na linha 3). O motor desenha o aerofólio em `carro + spoiler − anchor`, por cima do carro.
+- **`underglow`**: a primeira linha **vazia** logo abaixo do contorno de baixo da carroceria, entre as rodas (de 1 px depois da roda traseira até 1 px antes da dianteira). No `car_player`: `[11, 20, 11]`. O validador exige que essa linha esteja vazia em todos os frames.
+- Os aerofólios têm `anchor` no pé (último pixel do poste ou da base). Com isso, um aerofólio serve em qualquer carro.
+
+### 7.4 Aerofólios por silhueta
+
+Aerofólios atuais (usam o canal paint, saem da cor do carro):
+
+| Sprite | Tamanho | anchor | Sobe acima do pé |
+|---|---|---|---|
+| `spoiler_wing` | 7×4 | `[2, 3]` | 3 px (asa em 2 postes) |
+| `spoiler_ducktail` | 6×2 | `[2, 1]` | 1 px (lábio em cunha, discreto) |
+| `spoiler_gt` | 10×5 | `[2, 4]` | 4 px (asa larga, postes altos) |
+
+Limites para que os 3 aerofólios sirvam em qualquer modelo:
+- **Largura livre na tampa**: da ponta traseira até o vidro/cabine tem que haver pelo menos **10 px** sem cabine nas 4 linhas acima do mount, senão a asa GT invade o vidro. Cupê, sedã, muscle e picape (caçamba) cumprem; hatch e perua não.
+- **Altura**: o aerofólio pode passar até **2 px acima** do quadro do carro (a asa GT faz isso). A linha 14 de cada pista é livre, então ninguém é coberto. Nunca mais que 2 px.
+- **Hatch / perua / van** (traseira vertical, teto até a ponta): o mount vai no **teto**, na quina traseira (`[x da quina + 1, linha do teto − 1]`); a asa vira aerofólio de teto. A GT fica grande demais: aceitável, mas confira a prévia.
+- **Picape**: mount na tampa da caçamba (ponta traseira), como no cupê.
+- **Conversível / modelo sem tampa**: ainda precisa de um mount válido (é obrigatório pelo validador); use a borda traseira da carroceria.
+
+### 7.5 Néon
+
+O motor desenha o néon na linha `underglow`: pontas em `base`, meio em `light`, e um reflexo de 2 linhas no asfalto (mistura de 45% e 20% da `base`), 2 px mais largo para cada lado. O sprite do carro não desenha nada disso. A fileira de combinações do `docs/sprite-sheet.png` usa esse mesmo método.

@@ -2,6 +2,7 @@
 import { SLOT_KEYS, statTotals, powerOf, partBonus, upgradeCost, rarityOf, rarityIndex, tableOdds, makePart } from '../engine/economy.js';
 import { isUnlocked, resetSave, addLog, receivePart } from '../engine/state.js';
 import { spriteDataURL } from '../engine/sprites.js';
+import { CUSTOM_CATS, CUSTOM_CAT_NAMES, catOptions, optionOf, priceOf, unlockStageOf, isOwned, swatchColor } from '../engine/custom.js';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = n => (Math.round(n * 10) / 10).toLocaleString('pt-BR');
@@ -17,6 +18,8 @@ export function initUI(game, { onChange }) {
   const ICON_EQUIP = uiIcon('icon_ui_equip', 'Equipar');
   const statIcon = k => statIcons[k] ? `<img class="si" src="${statIcons[k]}" alt="">` : '';
   let tab = 'garage';
+  let gview = 'parts';   // garagem: 'parts' (peças) ou 'style' (personalização)
+  const trying = {};     // opções que o jogador está só provando (ainda não compradas), por categoria
   try { tab = localStorage.getItem('nitro-crew-tab') || 'garage'; } catch { /* sem storage */ }
 
   document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
@@ -71,6 +74,36 @@ export function initUI(game, { onChange }) {
       part.level = item.level ?? 1;
       const where = receivePart(balance, state, part);
       addLog(state, `Loja: comprou ${game.labels.loot({ kind: 'part', part })} por ${item.price}$${where === 'equipped' ? ' (equipada)' : ''}`, part.rarity);
+    } else if (act === 'gview') {
+      gview = b.dataset.view;
+      refresh();
+      return;
+    } else if (act === 'cust') {
+      const { cat, opt } = b.dataset;
+      if (!custOpen(cat, opt)) return;
+      if (isOwned(game.CUSTOM, balance, state, cat, opt)) {
+        state.custom.chosen[cat] = opt;
+        delete trying[cat];
+        game.applyCustom();
+      } else {
+        trying[cat] = opt; // só prova: aparece na prévia
+        refresh();
+        return;
+      }
+    } else if (act === 'custBuy') {
+      const { cat, opt } = b.dataset;
+      const price = priceOf(balance, cat, opt);
+      if (price === null || !custOpen(cat, opt) || isOwned(game.CUSTOM, balance, state, cat, opt) || state.coins < price) return;
+      state.coins -= price;
+      state.custom.owned.push(`${cat}:${opt}`);
+      state.custom.chosen[cat] = opt;
+      delete trying[cat];
+      game.applyCustom();
+      addLog(state, `Personalização: ${CUSTOM_CAT_NAMES[cat]} ${optionOf(game.CUSTOM, cat, opt).name} por ${price}$`, 'epic');
+    } else if (act === 'custUndo') {
+      for (const k of Object.keys(trying)) delete trying[k];
+      refresh();
+      return;
     } else if (act === 'stage') {
       state.currentStage = b.dataset.stage;
       game.restartRace();
@@ -98,6 +131,64 @@ export function initUI(game, { onChange }) {
   }
 
   function garage() {
+    const sub = `<div class="subnav">
+      <button data-act="gview" data-view="parts" class="${gview === 'parts' ? 'active' : ''}">Peças</button>
+      <button data-act="gview" data-view="style" class="${gview === 'style' ? 'active' : ''}">Personalizar</button></div>`;
+    return sub + (gview === 'style' && game.CUSTOM ? style() : parts());
+  }
+
+  function custOpen(cat, id) {
+    const st = unlockStageOf(balance, cat, id);
+    if (!st) return true;
+    const idx = balance.stages.findIndex(s => s.id === st);
+    return idx < 0 || isUnlocked(balance, state, idx);
+  }
+
+  function style() {
+    const C = game.CUSTOM;
+    const shown = { ...state.custom.chosen, ...trying };
+    const car = game.buildCar(shown);
+    const preview = `<div class="preview"><img src="${spriteDataURL(car, 6)}" alt="Prévia do carro"></div>`;
+
+    const pending = Object.entries(trying).map(([cat, id]) => {
+      const price = priceOf(balance, cat, id);
+      const missing = price - state.coins;
+      return `<span class="buy"><button data-act="custBuy" data-cat="${cat}" data-opt="${esc(id)}" ${missing > 0 ? 'disabled' : ''}>
+        Comprar ${esc(CUSTOM_CAT_NAMES[cat])}: ${esc(optionOf(C, cat, id).name)} · ${price.toLocaleString('pt-BR')}$</button>
+        ${missing > 0 ? `<span class="dim">faltam ${missing.toLocaleString('pt-BR')}$</span>` : ''}</span>`;
+    }).join('');
+    const tryBar = pending ? `<div class="trybar"><span class="dim">Provando:</span>${pending}<button data-act="custUndo">Desfazer</button></div>` : '';
+
+    const cats = CUSTOM_CATS.map(cat => {
+      const opts = catOptions(C, cat).filter((o, i) => i === 0 || o.id === 'none' || priceOf(balance, cat, o.id) !== null);
+      const btns = opts.map(o => {
+        const owned = isOwned(C, balance, state, cat, o.id);
+        const open = custOpen(cat, o.id);
+        const sel = shown[cat] === o.id || (!shown[cat] && o === opts[0]);
+        const using = (state.custom.chosen[cat] ?? catOptions(C, cat)[0]?.id) === o.id;
+        let sw;
+        if (o.id === 'none') sw = '<span class="sw none">∅</span>';
+        else if (cat === 'spoiler') sw = S[o.sprite] ? `<img class="sw" src="${spriteDataURL(S[o.sprite], 3)}" alt="">` : '<span class="sw"></span>';
+        else sw = `<span class="sw" style="background:${esc(swatchColor(C, cat, o.id) ?? '#000')}"></span>`;
+        let tag;
+        if (using) tag = '<span class="tag">em uso</span>';
+        else if (owned) tag = '<span class="dim">seu</span>';
+        else if (!open) {
+          const st = balance.stages.find(s => s.id === unlockStageOf(balance, cat, o.id));
+          tag = `<span class="dim">libera em ${esc(st ? st.name : '?')}</span>`;
+        } else tag = `<span class="price">${priceOf(balance, cat, o.id).toLocaleString('pt-BR')}$</span>`;
+        return `<button class="opt ${sel ? 'sel' : ''} ${owned ? '' : 'notown'}" data-act="cust" data-cat="${cat}" data-opt="${esc(o.id)}" ${open ? '' : 'disabled'} title="${esc(o.name)}">
+          ${sw}<span class="on">${esc(o.name)}</span>${tag}</button>`;
+      }).join('');
+      return `<h3>${esc(CUSTOM_CAT_NAMES[cat])}</h3><div class="opts">${btns}</div>`;
+    }).join('');
+
+    return `${preview}${tryBar}
+      <p class="dim">Só visual: não muda a potência. Cada opção é comprada uma vez e vale para todos os seus carros. Clique numa opção para provar antes de comprar.</p>
+      ${cats}`;
+  }
+
+  function parts() {
     const slots = SLOT_KEYS.map(slot => {
       const p = state.equipped[slot];
       const def = balance.slots[slot];

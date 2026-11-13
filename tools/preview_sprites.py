@@ -10,7 +10,7 @@ import zlib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from validate_sprites import load, ROOT  # noqa: E402
+from validate_sprites import load, load_custom, ROOT  # noqa: E402
 
 OUT = ROOT / "docs" / "sprite-sheet.png"
 BG = (40, 42, 54)
@@ -55,9 +55,57 @@ class Canvas:
         Path(path).write_bytes(data)
 
 
+COMBOS = [  # paint, glass, headlight, rims, neon, spoiler
+    ("stock", "stock", "stock", "stock", "none", "wing"),
+    ("stock", "stock", "stock", "stock", "none", "none"),
+    ("red", "smoke", "xenon", "chrome", "cyan", "gt"),
+    ("blue", "mirror", "ice_blue", "black", "pink", "ducktail"),
+    ("green", "stock", "stock", "gold", "green", "wing"),
+    ("purple", "smoke", "violet", "chrome", "purple", "gt"),
+    ("white", "mirror", "xenon", "black", "orange", "none"),
+    ("matte_black", "smoke", "ice_blue", "bronze", "pink", "gt"),
+    ("gold", "emerald", "stock", "black", "cyan", "ducktail"),
+    ("matte_black", "emerald", "violet", "gold", "green", "wing"),
+    ("white", "stock", "stock", "stock", "none", "ducktail"),
+    ("gold", "smoke", "xenon", "chrome", "orange", "wing"),
+]
+CELL_W, CELL_H, PER_ROW = 40, 20, 6
+
+
+def mix(a, b, t):
+    return tuple(round(x + (y - x) * t) for x, y in zip(a, b))
+
+
+def draw_custom_car(cv, x, y, sprites, pal, custom, combo, key="car_player", frame=0):
+    """Desenha o carro como o motor deve fazer: troca canais, néon embaixo e aerofólio por cima."""
+    opts = custom["options"]
+    cats = ["paint", "glass", "headlight", "rims", "neon", "spoiler"]
+    sel = {c: next(o for o in opts[c] if o["id"] == i) for c, i in zip(cats, combo)}
+    p = dict(pal)
+    for c in ("paint", "glass", "headlight", "rims"):
+        p.update({k: hex_rgb(v) for k, v in sel[c]["colors"].items()})
+    car = sprites[key]
+    m = car["mounts"]
+    if sel["neon"]["id"] != "none":
+        base, light = hex_rgb(sel["neon"]["colors"]["base"]), hex_rgb(sel["neon"]["colors"]["light"])
+        x0, x1, uy = m["underglow"]
+        for xx in range(x0 - 2, x1 + 3):  # reflexo no asfalto (2 linhas, mais fraco)
+            for dy, a in ((1, 0.45), (2, 0.2)):
+                X, Y = x + xx, y + uy + dy
+                cv.px[Y][X] = mix(cv.px[Y][X], base, a)
+        for xx in range(x0, x1 + 1):
+            cv.px[y + uy][x + xx] = light if x0 + 1 < xx < x1 - 1 else base
+    cv.blit(car["frames"][frame], x, y, p)
+    if sel["spoiler"].get("sprite"):
+        sp = sprites[sel["spoiler"]["sprite"]]
+        ax, ay = sp["anchor"]
+        cv.blit(sp["frames"][0], x + m["spoiler"][0] - ax, y + m["spoiler"][1] - ay, p)
+
+
 def main():
     scale = int(sys.argv[1]) if len(sys.argv) > 1 else 4
     palette, theme, sprites = load()
+    custom = load_custom()
     pal = {k: hex_rgb(v) for k, v in palette.items()}
     sky = hex_rgb(theme["sky"])
     pad = 4
@@ -66,6 +114,8 @@ def main():
     scene_w, scene_h = 240, 108
     rows_layout = []
     y = pad + scene_h + pad + 12 + pad  # espaço para a faixa de paleta
+    custom_y = y  # fileira de combinações de personalização
+    y += ((len(COMBOS) + PER_ROW - 1) // PER_ROW) * CELL_H + pad
     width = scene_w + 2 * pad
     for key, s in sprites.items():
         if key in ("road", "skyline_far", "skyline_near", "finish_flag"):
@@ -106,7 +156,10 @@ def main():
         if key in sprites:
             if key == "car_player" and "fx_boost" in sprites:
                 cv.blit(sprites["fx_boost"]["frames"][1], sx0 + x - 8, sy0 + 48 + lane * 15 + 6, pal)
-            cv.blit(sprites[key]["frames"][0], sx0 + x, sy0 + 48 + lane * 15, pal)
+            if key == "car_player":
+                draw_custom_car(cv, sx0 + x, sy0 + 48 + lane * 15, sprites, pal, custom, COMBOS[0])
+            else:
+                cv.blit(sprites[key]["frames"][0], sx0 + x, sy0 + 48 + lane * 15, pal)
     for i, key in enumerate(["crate_common", "crate_rare", "crate_legendary"]):
         cv.blit(sprites[key]["frames"][-1], sx0 + 165 + i * 12, sy0 + 48 + 2 * 15 + 2, pal)
     cv.blit(sprites["coin"]["frames"][0], sx0 + 20, sy0 + 48 + 2 * 15 + 4, pal)
@@ -114,7 +167,13 @@ def main():
     # faixa de paleta
     py = pad + scene_h + pad
     for i, rgb in enumerate(pal.values()):
-        cv.fill(pad + i * 10, py, 9, 12, rgb)
+        cv.fill(pad + i * 7, py, 6, 12, rgb)
+
+    asphalt = pal.get("a", (35, 37, 56))
+    for i, combo in enumerate(COMBOS):
+        cx, cy = pad + (i % PER_ROW) * CELL_W, custom_y + (i // PER_ROW) * CELL_H
+        cv.fill(cx, cy, CELL_W - 1, CELL_H - 1, asphalt)
+        draw_custom_car(cv, cx + 4, cy + 3, sprites, pal, custom, combo, frame=i % 4)
 
     for key, s, y in rows_layout:
         for fi, fr in enumerate(s["frames"]):

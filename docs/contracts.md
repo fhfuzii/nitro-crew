@@ -58,6 +58,78 @@ Chaves obrigatórias (tamanho exato):
 
 A cor do céu de fundo vem de `THEME.sky`.
 
+## 2.1 Personalização do carro (`CUSTOM` em `src/art/sprites.js`)
+
+É só visual: não muda nenhum atributo. Vale para o carro do jogador de hoje (`car_player`) e para **todo modelo de carro do jogador que vier depois** (chaves `car_player_<modelo>`). Os rivais não usam isso.
+
+### Canais de cor (letras reservadas)
+
+Os carros do jogador pintam as partes personalizáveis com letras reservadas. O motor troca a cor dessas letras pela opção escolhida. Cada letra também precisa existir em `PALETTE`, com a cor da opção padrão, para o carro aparecer certo sem personalização.
+
+| Canal | Letras → tom | Onde |
+|---|---|---|
+| `paint` | `1` sombra, `2` base, `3` luz, `4` faixa, `5` luz da faixa | carroceria e faixa decorativa |
+| `glass` | `6` base, `7` reflexo | vidros |
+| `headlight` | `8` base, `9` núcleo | farol dianteiro (a lanterna traseira continua `R`) |
+| `rims` | `e` base, `E` brilho | aro das rodas (o pneu continua `K`) |
+
+Regras para qualquer modelo novo:
+- Usar **só** essas letras nas partes personalizáveis, e não usá-las em mais nada.
+- Pode ter menos partes (um carro sem faixa simplesmente não usa `4`/`5`), mas não pode inventar canal novo sem atualizar este contrato.
+- Declarar `mounts` (abaixo), para o aerofólio e o néon se encaixarem.
+
+### Pontos de encaixe (`mounts` no sprite do carro)
+
+```js
+car_player: {
+  w: 32, h: 14, fps: 12, frames: [...],
+  mounts: {
+    spoiler: [x, y],          // pixel do carro onde a base do aerofólio encosta (tampa traseira)
+    underglow: [x0, x1, y],   // néon: faixa de x0 até x1 na linha y (logo abaixo da carroceria, entre as rodas)
+  },
+},
+```
+
+O carro base **não** desenha aerofólio: ele vem sempre de um sprite separado.
+
+### Aerofólios (sprites `spoiler_<id>`)
+
+```js
+spoiler_wing: { w: 8, h: 5, frames: [[...]], anchor: [ax, ay] }, // 1 frame
+```
+
+`anchor` é o pixel do aerofólio que fica em cima de `mounts.spoiler`: o motor desenha o aerofólio em `posição do carro + mounts.spoiler − anchor`, por cima do carro, sem recortar no quadro 32×14 (pode passar para cima ou para os lados). Um modelo pode ter variante própria `spoiler_<id>_<modelo>` (ex.: `spoiler_gt_hatch` para `car_player_hatch`); sem ela o motor usa o genérico. Pode usar os canais `paint` (`1`–`5`), aí ele sai da cor do carro.
+
+### Néon
+
+Desenhado pelo motor: uma faixa de luz em `mounts.underglow` (cor `base`, com brilho `light`) e um reflexo suave no asfalto abaixo.
+
+### Catálogo (`CUSTOM.options`)
+
+Os `id` abaixo são fixos (o save e os preços dependem deles). O agente de arte define nomes e cores; o agente de regras define os preços (seção 3.2).
+
+```js
+export const CUSTOM = {
+  options: {
+    paint:     [ { id: 'stock', name: 'Laranja Nitro', colors: { '1': '#..', '2': '#..', '3': '#..', '4': '#..', '5': '#..' } }, /* ... */ ],
+    glass:     [ { id: 'stock', name: '...', colors: { '6': '#..', '7': '#..' } } ],
+    headlight: [ { id: 'stock', name: '...', colors: { '8': '#..', '9': '#..' } } ],
+    rims:      [ { id: 'stock', name: '...', colors: { 'e': '#..', 'E': '#..' } } ],
+    neon:      [ { id: 'none', name: 'Sem néon' }, { id: 'pink', name: '...', colors: { base: '#..', light: '#..' } } ],
+    spoiler:   [ { id: 'none', name: 'Sem aerofólio' }, { id: 'wing', name: '...', sprite: 'spoiler_wing' } ],
+  },
+};
+```
+
+| Categoria | `id` (o primeiro é o padrão, grátis) |
+|---|---|
+| `paint` | `stock`, `red`, `blue`, `green`, `purple`, `white`, `matte_black`, `gold` |
+| `glass` | `stock`, `smoke`, `mirror`, `emerald` |
+| `headlight` | `stock`, `xenon`, `ice_blue`, `violet` |
+| `rims` | `stock`, `chrome`, `black`, `gold`, `bronze` |
+| `neon` | `none`, `pink`, `cyan`, `green`, `purple`, `orange` |
+| `spoiler` | `wing` (padrão: a asa que o carro já tem), `none`, `ducktail`, `gt` |
+
 ## 3. `data/balance.json`
 
 Campos obrigatórios:
@@ -143,6 +215,23 @@ Catálogo fixo de peças caras. Cada item pode ser comprado **uma vez**; aparece
 - `id` único e estável (o save guarda os ids comprados; não renomeie depois de publicado).
 - `slot` é um dos 4 slots (não aceita `"any"`); `level` é o nível inicial da peça (padrão 1).
 - A peça comprada entra como qualquer prêmio: equipa sozinha se for melhor e o "equipar automaticamente" estiver ligado; senão vai para a garagem.
+
+## 3.2 Preços da personalização (`balance.cosmetics`)
+
+```jsonc
+"cosmetics": {
+  "paint": {
+    "stock": { "price": 0 },
+    "gold":  { "price": 2500, "unlock": { "stage": "s8" } }   // unlock é opcional
+  }
+  // glass, headlight, rims, neon, spoiler: mesmo formato, chaves = ids de CUSTOM.options
+}
+```
+
+- Cada opção é comprada **uma vez**; depois o jogador troca entre as que já tem de graça.
+- O padrão de cada categoria (primeiro id da tabela da seção 2.1) tem preço 0 e já vem com o jogo. `none` também é grátis.
+- Opção sem preço aqui não aparece à venda.
+- É só visual: o preço compete com as melhorias de peça pelas mesmas moedas.
 
 ## 4. Save (`localStorage`, chave `nitro-crew-save`)
 

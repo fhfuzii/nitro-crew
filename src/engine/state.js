@@ -14,6 +14,7 @@ export function newState(balance) {
     stageRaces: {},
     currentStage: balance.stages[0].id,
     shopBought: [],
+    custom: { owned: [], chosen: {} }, // personalização visual (ids de CUSTOM.options)
     autoAdvance: true,
     autoEquip: true,
     nextPartId: 1,
@@ -30,6 +31,8 @@ export function load(balance) {
       if (s && s.v === SAVE_VERSION) {
         if (!balance.stages.some(st => st.id === s.currentStage)) s.currentStage = balance.stages[0].id;
         if (!Array.isArray(s.shopBought)) s.shopBought = []; // saves anteriores à loja
+        if (!s.custom || !Array.isArray(s.custom.owned)) s.custom = { owned: [], chosen: {} }; // saves anteriores à personalização
+        if (!s.custom.chosen) s.custom.chosen = {};
         setNextPartId(s.nextPartId || 1);
         return s;
       }

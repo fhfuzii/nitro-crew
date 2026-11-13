@@ -65,6 +65,25 @@ img.si { width: 24px; height: 24px; image-rendering: pixelated; vertical-align: 
 .card[class*="r-"] { border-color: var(--rc); }
 .rar, span[class*="r-"], .logrow[class*="r-"] { color: var(--rc); }
 .card.r-legendary { box-shadow: 0 0 0 2px #000, 0 0 8px var(--rc); }
+/* Garagem: personalização */
+.subnav { display: flex; gap: 6px; margin-bottom: 4px; }
+.subnav button.active { border-color: var(--accent); color: var(--accent); }
+.preview {
+  display: flex; justify-content: center; align-items: center; padding: 18px 8px 10px;
+  background: linear-gradient(var(--sky) 55%, #232538 55%); border: 2px solid var(--panelBorder);
+}
+.preview img { image-rendering: pixelated; max-width: 100%; }
+.trybar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.trybar .buy { align-items: flex-start; }
+.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+button.opt { display: flex; align-items: center; gap: 8px; text-align: left; font-size: 8px; flex-wrap: wrap; }
+button.opt .on { flex: 1; min-width: 0; }
+button.opt.sel { border-color: var(--accent); }
+button.opt.notown .on { color: var(--textDim); }
+button.opt .price { color: var(--accent); }
+.sw { width: 16px; height: 16px; flex: none; border: 2px solid #000; display: inline-block; image-rendering: pixelated; }
+img.sw { width: auto; height: 16px; border: none; }
+.sw.none { border-color: var(--panelBorder); text-align: center; line-height: 12px; color: var(--textDim); }
 @media (max-width: 600px) {
   header { padding: 8px 16px; }
   .grid { grid-template-columns: 1fr; }

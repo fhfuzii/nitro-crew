@@ -187,6 +187,77 @@ Leitura do resultado:
 
 O câmbio raro e as lendárias de turbo, câmbio e pneus quase nunca compensam para o guloso, porque quando ele economizaria para esses itens já tem peça igual ou melhor no slot.
 
+## 5.2 Personalização visual (`balance.cosmetics`, contrato 3.2)
+
+A personalização é só visual e não muda nenhum atributo. Por isso funciona como um **ralo de moedas** que compete com os upgrades e com a Loja.
+
+O pedido do dono do jogo foi que o jogador "tenha que pagar para conseguir". A escala parte da renda medida no simulador (loja ligada, semente 12345). Cada opção é comprada uma vez; depois o jogador troca entre as que já tem de graça.
+
+**Renda no ponto em que cada faixa libera.** O minuto de jogo inclui a corrida e os 5 s de intervalo.
+
+| Fase | Moedas por corrida | Duração do ciclo (corrida + 5 s) | Moedas por minuto |
+|---|---|---|---|
+| 1 | 49 | 36 s | ~82 |
+| 4 | 91 | 42 s | ~129 |
+| 6 | 138 | 43 s | ~195 |
+| 8 | 201 | 42 s | ~286 |
+| 10 (pós-campanha) | 251 | 42 s | ~363 |
+
+**Preços:**
+
+| Faixa | Libera | Opções (`categoria: id`) | Preço | Custo no ponto em que libera | Referência |
+|---|---|---|---|---|---|
+| Padrão | sempre | `paint: stock`, `glass: stock`, `headlight: stock`, `rims: stock`, `neon: none`, `spoiler: wing`, `spoiler: none` | 0 | — | contrato |
+| Básica | fase 1 (Docas) | `glass: smoke`, `headlight: xenon` | 200 | ~4 corridas ≈ **2,5 min** | "alguns minutos" |
+| | | `paint: red`, `paint: blue`, `paint: green` | 250 | ~5 corridas ≈ **3 min** | |
+| | | `rims: black` | 300 | ~6 corridas ≈ **3,7 min** | |
+| Rua | fase 4 (Centro Velho) | `paint: purple`, `paint: white`, `headlight: ice_blue` | 700 | ~8 corridas ≈ **5,4 min** | ≈ peça rara da Loja (600–800) |
+| | | `glass: mirror`, `rims: bronze`, `spoiler: ducktail` | 800 | ~9 corridas ≈ **6,2 min** | |
+| | | `rims: chrome` | 900 | ~10 corridas ≈ **7,0 min** | |
+| Especial | fase 6 | `glass: emerald`, `headlight: violet` | 1100 | ~8 corridas ≈ **5,6 min** | ≈ peça épica da Loja (1200–1400) |
+| Premium: néon | fase 6 | `neon: pink`, `cyan`, `green`, `purple`, `orange` | 1500 cada | ~11 corridas ≈ **7,7 min** | um pouco acima da épica da Loja |
+| Premium: Alto da Serra | fase 8 | `paint: matte_black` | 2200 | ~11 corridas ≈ **7,7 min** | ≈ lendária da Loja (2900–3500) |
+| | | `rims: gold` | 2400 | ~12 corridas ≈ **8,4 min** | |
+| | | `spoiler: gt` | 2600 | ~13 corridas ≈ **9,1 min** | |
+| | | `paint: gold` | 2800 | ~14 corridas ≈ **9,8 min** | |
+
+**Resumo:**
+
+- Em tempo de jogo, a faixa básica custa de 2,5 a 4 min e a de rua de 5 a 7 min.
+- Cada item premium (dourado, néon, asa GT) custa de 8 a 10 min, o mesmo que uma compra da Loja na fase em que libera (8–15 corridas).
+- O catálogo inteiro custa **26.550 moedas**. A campanha toda rende cerca de 8.000 moedas (soma de corridas × renda por fase).
+- Ou seja, durante a campanha dá para comprar só uma parte do catálogo. O resto vira meta para depois da campanha: cerca de 73 min de jogo idle na fase 10, a ~363 moedas por minuto.
+
+**Lógica (com o que é suposição marcado):**
+
+- **Âncora dos preços.** Cada faixa custa um número fixo de corridas de renda da fase em que libera. Esse é o mesmo critério da Loja, e o pedido do dono foi a referência: "simples = alguns minutos; premium = uma compra da Loja".
+  - A escolha de qual id fica em qual faixa é **suposição** de design: cores comuns são baratas; metálico, fosco, dourado, néon e asa GT são premium.
+- **Fase de liberação por bairro (suposição).**
+  - Básicos desde as Docas.
+  - Opções "de rua" a partir do Centro Velho (fase 4).
+  - Néon e vidros e faróis especiais a partir da fase 6 (Largo da Feira).
+  - Itens de luxo no Alto da Serra (fase 8).
+  - Liberar mais tarde evita que o jogador gaste em visual na fase 1 o que precisaria para passar da fase 2.
+- **Cores de néon com o mesmo preço (suposição).** As 5 cores custam 1500. Uma alternativa seria a primeira cara e as outras baratas, mas o formato atual não tem preço condicional.
+
+**Impacto na campanha.** Estimado com `--cosmetics-pct`: cada jogador sorteia X% do catálogo pago e compra cada opção assim que libera e há moedas, antes da Loja e dos upgrades. É um comprador impaciente, o pior caso para o ritmo.
+
+| Lista de desejos | Opções compradas na campanha | Moedas gastas | Campanha | Diferença |
+|---|---|---|---|---|
+| 0% (guloso puro) | 0 | 0 | 0,70 h | — |
+| 25% | 4,2 | 3090 | 0,83 h | +19% |
+| 50% | 7,2 | 4426 | 0,88 h | +26% |
+| 100% | 11,1 de 31 | 5473 | 0,93 h | +33% |
+
+O ralo é real: quem compra tudo o que pode demora cerca de 1/3 a mais. Mesmo assim ninguém trava, porque a campanha continua em menos de 1 h. Comprar tudo antes de terminar a campanha é impossível.
+
+**Novos modelos de carro (contrato 2.1).** As opções compradas valem para todo modelo do jogador.
+
+- Isso **não muda a escala atual**. Os preços foram calibrados pelo tempo de jogo que cada item custa hoje, e cada compra só fica mais valiosa a cada modelo novo (paga uma vez e usa em todos). Ninguém precisa recomprar.
+- Duas consequências para o futuro:
+  1. Se surgirem cosméticos **exclusivos de um modelo**, eles devem custar menos que os universais da mesma faixa. Sugestão (suposição): cerca de 60%, porque servem a um carro só.
+  2. O catálogo de 26,5 mil moedas é a principal meta de longo prazo depois da campanha. Se os modelos novos vierem junto com fases novas (renda maior por corrida), os premium continuam proporcionais à renda das fases 8–10. Pode ser preciso uma faixa nova, mais cara, para as fases novas.
+
 ## 6. Jogador guloso (modelo do simulador)
 
 - **Peças.** Equipa a peça de maior bônus em cada slot (em caso de empate, mantém a atual) e desmonta todas as outras em `scrapCoins`.
@@ -198,6 +269,7 @@ O câmbio raro e as lendárias de turbo, câmbio e pneus quase nunca compensam p
     - se faltam até **10 × a renda média das últimas 5 corridas**, **economiza**: não compra upgrade nesta rodada;
     - se faltam mais que isso, ignora a loja e faz upgrades normalmente.
   - Com `--no-shop` a loja é ignorada.
+- **Personalização.** O guloso não compra cosméticos. A opção `--cosmetics-pct X` estima o efeito de um jogador que compra X% do catálogo (seção 5.2).
 - **Fase.** Sempre corre a fase mais alta liberada.
 - **Tempo.** O tempo de jogo é a duração simulada de cada corrida mais 5 s de intervalo entre corridas.
 - **Corrida simulada.** Usa passos de 1/60 s com suavização exponencial (constante de 0,5 s) em forma fechada, matematicamente idêntica a repetir `v += (alvo − v)·(1 − e^(−dt/0,5))`.
@@ -316,6 +388,7 @@ Por slot (media por jogador): upgrades comprados | bonus da peca equipada no fim
 |---|---|---|
 | `campaign.finalStageWins` | vitórias na última fase para considerar a campanha concluída (3) | simulador. O motor pode usar para mostrar "campanha concluída" e ignorar se não precisar |
 | `shop.items` | catálogo da loja (contrato 3.1) | motor e simulador |
+| `cosmetics` | preços da personalização visual (contrato 3.2) | motor; simulador só com `--cosmetics-pct` |
 
 Nenhum campo obrigatório foi renomeado ou removido. A fase 1 tem `unlock.prevStageWins = 0` porque já começa liberada.
 
