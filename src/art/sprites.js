@@ -827,6 +827,41 @@ export const SPRITES = {
       ],
     ],
   },
+  // Ícones de botão 10x10 (UI, sobre THEME.panel): seta de melhorar e chave de boca de equipar.
+  icon_ui_upgrade: {
+    w: 10, h: 10, fps: 1,
+    frames: [
+      [
+        '....kk....',
+        '...kNNk...',
+        '..kNNnnk..',
+        '.kNNnnnnk.',
+        'kNNnnnnnqk',
+        'kkkNnnqkkk',
+        '..kNnnqk..',
+        '..kNnnqk..',
+        '..kNnnqk..',
+        '..kkkkkk..',
+      ],
+    ],
+  },
+  icon_ui_equip: {
+    w: 10, h: 10, fps: 1,
+    frames: [
+      [
+        '.....kGG..',
+        '....kGGk.G',
+        '....kGk.GG',
+        '....kGGGGk',
+        '...kwGGgk.',
+        '..kwGgk...',
+        '.kwGgk....',
+        'kwGgk.....',
+        'kGgk......',
+        '.kk.......',
+      ],
+    ],
+  },
   // Chama do nitro (ciano), presa na borda direita; o motor desenha em x-8, y+6 do carro.
   fx_boost: {
     w: 8, h: 6, fps: 14,

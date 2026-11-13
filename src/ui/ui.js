@@ -12,6 +12,9 @@ export function initUI(game, { onChange }) {
   const icons = Object.fromEntries(SLOT_KEYS.map(s => [s, S[`icon_${s}`] ? spriteDataURL(S[`icon_${s}`], 3) : '']));
   const statIcons = Object.fromEntries(['topSpeed', 'accel', 'grip', 'boost']
     .map(k => [k, S[`icon_stat_${k}`] ? spriteDataURL(S[`icon_stat_${k}`], 2) : '']));
+  const uiIcon = (key, fallback) => S[key] ? `<img class="bi" src="${spriteDataURL(S[key], 2)}" alt="">` : fallback;
+  const ICON_UP = uiIcon('icon_ui_upgrade', '▲');
+  const ICON_EQUIP = uiIcon('icon_ui_equip', 'Equipar');
   const statIcon = k => statIcons[k] ? `<img class="si" src="${statIcons[k]}" alt="">` : '';
   let tab = 'garage';
   try { tab = localStorage.getItem('nitro-crew-tab') || 'garage'; } catch { /* sem storage */ }
@@ -46,11 +49,11 @@ export function initUI(game, { onChange }) {
       const part = state.bag.splice(i, 1)[0];
       const v = rarityOf(balance, part.rarity).scrapCoins;
       state.coins += v;
-      addLog(state, `Desmontou ${game.labels.loot({ kind: 'part', part })}: +${v} moedas`, 'common');
+      addLog(state, `Vendeu ${game.labels.loot({ kind: 'part', part })}: +${v} moedas`, 'common');
     } else if (act === 'scrapAll') {
       let total = 0;
       for (const p of state.bag) total += rarityOf(balance, p.rarity).scrapCoins;
-      if (state.bag.length) addLog(state, `Desmontou ${state.bag.length} peças: +${total} moedas`, 'common');
+      if (state.bag.length) addLog(state, `Vendeu ${state.bag.length} peças: +${total} moedas`, 'common');
       state.bag = [];
       state.coins += total;
     } else if (act === 'upgrade') {
@@ -94,7 +97,7 @@ export function initUI(game, { onChange }) {
       const cost = upgradeCost(balance, p);
       const btn = cost === null
         ? `<span class="dim">nível máx.</span>`
-        : `<button data-act="upgrade" data-id="${p.id}" ${state.coins < cost ? 'disabled' : ''}>Melhorar ${cost}$</button>`;
+        : `<button class="ib up" data-act="upgrade" data-id="${p.id}" title="Melhorar para o nível ${p.level + 1} (${cost}$)" aria-label="Melhorar por ${cost} moedas" ${state.coins < cost ? 'disabled' : ''}>${ICON_UP}${cost}$</button>`;
       return `<div class="card slot r-${p.rarity}"><img src="${icons[slot]}" alt="">
         <div><b>${esc(def.name)}</b> <span class="rar">${esc(r.name)}</span>
         <div class="dim">nível ${p.level}/${r.maxLevel} · ${statIcon(def.stat)}+${fmt(partBonus(balance, p))} ${esc(statName(def.stat))}</div></div>${btn}</div>`;
@@ -110,7 +113,7 @@ export function initUI(game, { onChange }) {
       return `<div class="card item r-${p.rarity}"><img src="${icons[p.slot]}" alt="">
         <div><b>${esc(def.name)}</b> <span class="rar">${esc(r.name)}</span>
         <div class="dim">nível ${p.level} · <span class="${cls}">${diff > 0 ? '+' : ''}${fmt(diff)}</span> vs atual</div></div>
-        <span class="btns"><button data-act="equip" data-id="${p.id}">Equipar</button><button data-act="scrap" data-id="${p.id}">${r.scrapCoins}$</button></span></div>`;
+        <span class="btns"><button class="ib" data-act="equip" data-id="${p.id}" title="Equipar" aria-label="Equipar">${ICON_EQUIP}</button><button data-act="scrap" data-id="${p.id}" title="Vender por ${r.scrapCoins}$" aria-label="Vender por ${r.scrapCoins} moedas">${r.scrapCoins}$</button></span></div>`;
     }).join('') || '<p class="dim">Nenhuma peça guardada. Peças aparecem em caixas na pista e no prêmio final.</p>';
 
     const totals = statTotals(balance, state.equipped);
@@ -118,7 +121,7 @@ export function initUI(game, { onChange }) {
 
     return `<div class="stats">${stats}</div>
       <h3>Peças equipadas</h3><div class="grid">${slots}</div>
-      <h3>Garagem (${state.bag.length}) ${state.bag.length ? '<button data-act="scrapAll">Desmontar tudo</button>' : ''}</h3>
+      <h3>Garagem (${state.bag.length}) ${state.bag.length ? '<button data-act="scrapAll">Vender tudo</button>' : ''}</h3>
       <div class="grid">${items}</div>
       <div class="toggles">
         ${toggle('autoEquip', 'Equipar automaticamente peças melhores')}
