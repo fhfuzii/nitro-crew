@@ -52,6 +52,7 @@ Chaves obrigatórias (tamanho exato):
 | `crate_common` … `crate_legendary` (5) | 10 × 10 | 1–2 | caixa de prêmio que aparece na pista |
 | `coin` | 6 × 6 | 4 | moeda girando |
 | `icon_engine`, `icon_transmission`, `icon_tires`, `icon_turbo` | 12 × 12 | 1 | ícones das peças na garagem |
+| `icon_stat_topSpeed`, `icon_stat_accel`, `icon_stat_grip`, `icon_stat_boost` | 12 × 12 | 1 | ícones dos atributos (contagiro, ▶▶, pneu com fumaça/água, garrafa de nitro) |
 | `fx_boost` | 8 × 6 | 2–3 | chama do nitro atrás do carro |
 | `finish_flag` | 8 × 60 | 1 | linha de chegada quadriculada (ocupa a pista toda) |
 

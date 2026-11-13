@@ -5,7 +5,7 @@ Jogo idle de corrida de rua em pixel art. Você é o gerente da equipe: o carro 
 ## Rodar localmente
 
 ```bash
-python -m http.server 8080
+python tools/serve.py
 ```
 
 Abra http://localhost:8080.

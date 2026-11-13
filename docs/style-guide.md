@@ -56,6 +56,9 @@ Corrida de rua noturna numa cidade brasileira fictícia: asfalto escuro, postes 
   - Rival B — hatch verde: teto alto e comprido, 3 janelas, traseira reta, carro mais curto.
   - Rival C — picape roxa: cabine alta, caçamba baixa, friso néon rosa.
 - Caixa 10×10, moeda 6×6, ícone 12×12, chama do nitro 8×6 (desenhada pelo motor em `x-8, y+6` do carro; a chama sai da borda direita e se abre para a esquerda).
+- **Ícones 12×12** (1 frame, para a UI sobre `THEME.panel` = `#1a1c2c`, a mesma cor do contorno `k`): o contorno some no painel, então a silhueta tem que vir dos tons internos. Use a borda externa em `g`/`G` onde precisar destacar e mantenha pelo menos 1 tom claro (`G`, `w`, luz da família) em cada ícone.
+  - Peças: `icon_engine` (bloco com tomada laranja), `icon_transmission` (engrenagem com cubo ciano), `icon_tires` (pneu grande ocupando o ícone, aro claro), `icon_turbo` (caracol com rotor laranja).
+  - Atributos: `icon_stat_topSpeed` (contagiro com zona vermelha `R` e ponteiro `y`), `icon_stat_accel` (▶▶ verde `N/n`), `icon_stat_grip` (pneu menor no alto + respingo `c/B` e fumaça `G/w` embaixo; é isso que o diferencia de `icon_tires`), `icon_stat_boost` (garrafa azul `B/b/d` com válvula `g` e faixa `c`, sem letras nem marca).
 - Pista 32×60 (4 pistas de 15 px): calçada `G/g` (y0–1), sombra `k` (y2), linha amarela tracejada `y/h` (y3), divisórias `G` em y14/29/44 (a linha livre entre carros), sombra + meio-fio (y58–59). Carros ocupam as linhas 0–13 da sua pista.
 - Skyline 64×48, repete na horizontal: topo transparente, céu vem de `THEME.sky` (`#141428`).
 

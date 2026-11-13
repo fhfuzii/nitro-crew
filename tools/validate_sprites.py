@@ -31,6 +31,10 @@ REQUIRED = {
     "icon_transmission": (12, 12, 1, 1),
     "icon_tires": (12, 12, 1, 1),
     "icon_turbo": (12, 12, 1, 1),
+    "icon_stat_topSpeed": (12, 12, 1, 1),
+    "icon_stat_accel": (12, 12, 1, 1),
+    "icon_stat_grip": (12, 12, 1, 1),
+    "icon_stat_boost": (12, 12, 1, 1),
     "fx_boost": (8, 6, 2, 3),
     "finish_flag": (8, 60, 1, 1),
 }

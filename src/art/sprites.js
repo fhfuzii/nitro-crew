@@ -750,6 +750,83 @@ export const SPRITES = {
       ],
     ],
   },
+  // Ícones de atributo 12x12 (UI, sobre THEME.panel): contagiro, avanço rápido, pneu derrapando, garrafa de nitro genérica.
+  icon_stat_topSpeed: {
+    w: 12, h: 12, fps: 1,
+    frames: [
+      [
+        '...kkkkkk...',
+        '.kkGGGGGGkk.',
+        '.kGKwKKKRGk.',
+        'kGwKKKKKRRGk',
+        'kGKKKKKKyRGk',
+        'kGwKKKKyKKGk',
+        'kGKKKgyKKKGk',
+        'kGKKKggKKKGk',
+        'kGKKKKKKKKgk',
+        '.kgKKKKKKgk.',
+        '.kkggggggkk.',
+        '...kkkkkk...',
+      ],
+    ],
+  },
+  icon_stat_accel: {
+    w: 12, h: 12, fps: 1,
+    frames: [
+      [
+        '............',
+        'kk....kk....',
+        'kNk...kNk...',
+        'kNNk..kNNk..',
+        'kNNnk.kNNnk.',
+        'kNnnnkkNnnnk',
+        'knnnnkknnnnk',
+        'knnnk.knnnk.',
+        'knnk..knnk..',
+        'knk...knk...',
+        'kk....kk....',
+        '............',
+      ],
+    ],
+  },
+  icon_stat_grip: {
+    w: 12, h: 12, fps: 1,
+    frames: [
+      [
+        '.....ggggk..',
+        '....gKgKKKk.',
+        '...gKKKKKKKk',
+        '...gKKGGgKKk',
+        '...gKKGkgKgk',
+        '...kKKgggKKk',
+        '...gKKKKKKKk',
+        '....kKKgKKk.',
+        'c.B..kkkkk..',
+        '.cBc.wGGw...',
+        'BcGGGGGGGGG.',
+        '..gggggggg..',
+      ],
+    ],
+  },
+  icon_stat_boost: {
+    w: 12, h: 12, fps: 1,
+    frames: [
+      [
+        '...kkkkkk...',
+        '...kGGGgk...',
+        '....kggk.kk.',
+        '...kkggkkgk.',
+        '..kkBBBbkk..',
+        '..kBwBbbdk..',
+        '..kBwBbbdk..',
+        '..kcccccck..',
+        '..kBwBbbdk..',
+        '..kBBBbbdk..',
+        '..kbbbbddk..',
+        '...kkkkkk...',
+      ],
+    ],
+  },
   // Chama do nitro (ciano), presa na borda direita; o motor desenha em x-8, y+6 do carro.
   fx_boost: {
     w: 8, h: 6, fps: 14,

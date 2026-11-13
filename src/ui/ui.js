@@ -10,6 +10,9 @@ export function initUI(game, { onChange }) {
   const { balance, state, S } = game;
   const $ = id => document.getElementById(id);
   const icons = Object.fromEntries(SLOT_KEYS.map(s => [s, S[`icon_${s}`] ? spriteDataURL(S[`icon_${s}`], 3) : '']));
+  const statIcons = Object.fromEntries(['topSpeed', 'accel', 'grip', 'boost']
+    .map(k => [k, S[`icon_stat_${k}`] ? spriteDataURL(S[`icon_stat_${k}`], 2) : '']));
+  const statIcon = k => statIcons[k] ? `<img class="si" src="${statIcons[k]}" alt="">` : '';
   let tab = 'garage';
   try { tab = localStorage.getItem('nitro-crew-tab') || 'garage'; } catch { /* sem storage */ }
 
@@ -94,7 +97,7 @@ export function initUI(game, { onChange }) {
         : `<button data-act="upgrade" data-id="${p.id}" ${state.coins < cost ? 'disabled' : ''}>Melhorar ${cost}$</button>`;
       return `<div class="card slot r-${p.rarity}"><img src="${icons[slot]}" alt="">
         <div><b>${esc(def.name)}</b> <span class="rar">${esc(r.name)}</span>
-        <div class="dim">nível ${p.level}/${r.maxLevel} · +${fmt(partBonus(balance, p))} ${esc(statName(def.stat))}</div></div>${btn}</div>`;
+        <div class="dim">nível ${p.level}/${r.maxLevel} · ${statIcon(def.stat)}+${fmt(partBonus(balance, p))} ${esc(statName(def.stat))}</div></div>${btn}</div>`;
     }).join('');
 
     const bag = [...state.bag].sort((a, b) => rarityIndex(balance, b.rarity) - rarityIndex(balance, a.rarity) || partBonus(balance, b) - partBonus(balance, a));
@@ -111,7 +114,7 @@ export function initUI(game, { onChange }) {
     }).join('') || '<p class="dim">Nenhuma peça guardada. Peças aparecem em caixas na pista e no prêmio final.</p>';
 
     const totals = statTotals(balance, state.equipped);
-    const stats = Object.entries(totals).map(([k, v]) => `<span>${esc(statName(k))} <b>${fmt(v)}</b></span>`).join('');
+    const stats = Object.entries(totals).map(([k, v]) => `<span class="stat">${statIcon(k)}${esc(statName(k))} <b>${fmt(v)}</b></span>`).join('');
 
     return `<div class="stats">${stats}</div>
       <h3>Peças equipadas</h3><div class="grid">${slots}</div>
